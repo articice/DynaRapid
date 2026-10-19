@@ -59,6 +59,9 @@ public class Input implements Serializable
 
     //This is the dangling input port which is connected to some input port
     public static Input dangling = null;
+
+    //Set by HwMlirParser: keep the bit widths of the graph instead of forcing them to 32
+    public static boolean exactBitwidths = false;
 ;
     /*
      * dataIn <- input <- bus <--------------------------------------------------<- bus <- output <- dataOut
@@ -125,7 +128,9 @@ public class Input implements Serializable
         }
 
         //////////////////////////////////////////////
-        if((bitSize != 0) && (bitSize != 1))
+        //Legacy graphs: every data width is treated as 32 (the legacy library has only 32-bit
+        //data variants). Graphs read from hw.mlir keep their real widths.
+        if(!Input.exactBitwidths && (bitSize != 0) && (bitSize != 1))
             bitSize = 32;
         //////////////////////////////////////////////
 

@@ -15,6 +15,7 @@ import ch.agsl.dynarapid.modules.Component;
 import ch.agsl.dynarapid.modules.Node;
 import ch.agsl.dynarapid.parser.DatabaseParser;
 import ch.agsl.dynarapid.parser.DotParser;
+import ch.agsl.dynarapid.parser.HwMlirParser;
 import ch.agsl.dynarapid.parser.LocationParser;
 import ch.agsl.dynarapid.strings.StringUtils;
 import com.xilinx.rapidwright.device.Device;
@@ -128,7 +129,9 @@ public class GraphGenerator {
 
         StringUtils.printIntro("Generating graph from: " + dotLoc);
 
-        Map<String, Node> nodes = DotParser.parser(dotLoc);
+        //hw.mlir from new Dynamatic, or a legacy Dynamatic DOT file
+        boolean hwMlir = dotLoc.endsWith(".mlir");
+        Map<String, Node> nodes = hwMlir ? HwMlirParser.parser(dotLoc) : DotParser.parser(dotLoc);
 
         if (nodes == null) {
             System.out.println("ERROR: Could not parse dot file. See above logs");
@@ -174,6 +177,12 @@ public class GraphGenerator {
                 generateDotFile(notFoundSynth, nodes, graphName);
 
             
+            //Dropping units would leave a broken circuit; legacy graphs keep the old behaviour
+            if (hwMlir) {
+                System.out.println("ERROR: " + notFound.size() + " library variants missing (list above); not generating a design");
+                return null;
+            }
+
             StringUtils.printIntro("Removing nodes whose databases were absent");
             nodes = removeUnfoundNodes(notFound, notFoundSynth, dcpNames, nodes);
             if (nodes == null) {

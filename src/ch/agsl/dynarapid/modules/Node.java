@@ -225,6 +225,23 @@ public class Node implements Serializable
         dcpName = DCPNameGenerator.getDCPName(this);
     }
 
+    //Node read from a new-Dynamatic hw.mlir instance (see parser/HwMlirParser).
+    //Each width is the data width of one channel input/output, 0 for a control (dataless) channel.
+    public Node(String instanceName, String typeName, String variantName, List<Integer> inputWidths, List<Integer> outputWidths, String description)
+    {
+        actualName = name = instanceName;
+        type = compOperator = typeName;
+        actualString = description;
+
+        for(int i = 0; i < inputWidths.size(); i++)
+            inputs.add(new Input(this, i, "in" + (i + 1) + ":" + inputWidths.get(i)));
+
+        for(int i = 0; i < outputWidths.size(); i++)
+            outputs.add(new Output(this, i, "out" + (i + 1) + ":" + outputWidths.get(i)));
+
+        dcpName = variantName;
+    }
+
     //This changes the name of the componennt if it is a buffer based on the number of slots and transperency
     public void bufferTypeOffset()
     {

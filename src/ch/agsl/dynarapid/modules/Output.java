@@ -131,7 +131,9 @@ public class Output implements Serializable
         }
         
         //////////////////////////////////////////////
-        if((bitSize != 0) && (bitSize != 1))
+        //Legacy graphs: every data width is treated as 32 (the legacy library has only 32-bit
+        //data variants). Graphs read from hw.mlir keep their real widths.
+        if(!Input.exactBitwidths && (bitSize != 0) && (bitSize != 1))
             bitSize = 32;
         //////////////////////////////////////////////
 
