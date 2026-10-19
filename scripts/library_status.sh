@@ -2,7 +2,7 @@
 # Progress of scripts/build_library.sh:  scripts/library_status.sh <part>
 PART=${1:-xcvu9p}
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-BUILD=$ROOT/libbuild/$PART
+BUILD=$ROOT/libbuild/$PART${BUILD_TAG:+-$BUILD_TAG}
 LIBDIR=$ROOT/library/placedRoutedDCPs/$PART-0.1.1
 total=$(grep -c . "$BUILD/variants.txt" 2>/dev/null || echo 0)
 

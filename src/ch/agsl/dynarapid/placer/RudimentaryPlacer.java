@@ -231,7 +231,9 @@ public class RudimentaryPlacer implements Placer{
             for(Shape sh : component.shapeList)
             {
                 //Condition to be applied for the image_resized_optimized design. Apparently it does not work with all the pblocks of getelementptr
-                if(component.dcpName.startsWith("getelementptr_"))
+                // this shape pin only exists in the xcvu13p library; on other parts
+                // any built getelementptr shape is fine
+                if(component.dcpName.startsWith("getelementptr_") && GenerateDesign.part.equals("xcvu13p"))
                     if(!sh.pblockName.equals("getelementptr_op_3_1_32_32_00000000000000000000000000000001_I60_J136_R25_C2"))
                         continue;
 

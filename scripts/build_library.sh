@@ -22,7 +22,7 @@ MIN_FREE_MEM_GB=${MIN_FREE_MEM_GB:-10}
 JAVA_HEAP=${JAVA_HEAP:-6G}
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-BUILD=$ROOT/libbuild/$PART
+BUILD=$ROOT/libbuild/$PART${BUILD_TAG:+-$BUILD_TAG}   # BUILD_TAG: separate state for a second build
 CP="$ROOT/build/classes/java/main:$ROOT/../bin:$ROOT/../jars/*"
 LIBDIR=$ROOT/library/placedRoutedDCPs/$PART-0.1.1
 
