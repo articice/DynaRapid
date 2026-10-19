@@ -321,7 +321,8 @@ public class HwMlirParser {
 
     /*
      * Library variant name: unit name without "handshake.", then each parameter as __KEY_value.
-     * Types print as i32/f32/ctrl, numbers without their type, strings without quotes.
+     * Types print as i32/f32/ctrl, numbers without their type, strings without quotes; SMV_* parameters
+ * (formal verification only) are left out.
      * Over maxVariantNameLength (e.g. the LSQ's per-instance configuration) the parameters
      * are replaced by a CRC32 of their text.
      */
@@ -333,6 +334,11 @@ public class HwMlirParser {
             if (item.isEmpty())
                 continue;
             int eq = item.indexOf(" = ");
+            if (eq == -1)
+                throw new IllegalArgumentException("unexpected parameter '" + item + "' of " + unitName);
+            //SMV_*: names for the formal-verification (SMV) back end; they don't change the RTL
+            if (item.substring(0, eq).startsWith("SMV_"))
+                continue;
             name.append("__").append(item.substring(0, eq)).append('_').append(parameterValue(item.substring(eq + 3)));
         }
         if (name.length() <= maxVariantNameLength)
@@ -358,13 +364,18 @@ public class HwMlirParser {
         return v.replace("-", "m").replaceAll("[^A-Za-z0-9]+", "_");
     }
 
-    //Splits at commas that are not inside <>, (), [] or {}
+    //Splits at commas that are not inside <>, (), [], {} or a string
     static List<String> splitTopLevel(String s) {
         List<String> items = new ArrayList<>();
         int depth = 0, begin = 0;
+        boolean inString = false;
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if (c == '<' || c == '(' || c == '[' || c == '{')
+            if (c == '"' && (i == 0 || s.charAt(i - 1) != '\\'))
+                inString = !inString;
+            else if (inString)
+                continue;
+            else if (c == '<' || c == '(' || c == '[' || c == '{')
                 depth++;
             else if (c == '>' || c == ')' || c == ']' || c == '}')
                 depth--;
