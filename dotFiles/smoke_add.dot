@@ -1,0 +1,4 @@
+Digraph G {
+	splines=spline;
+		"add_0" [type = "Operator", bbID= 1, op = "add_op", in = "in1:32 in2:32 ", out = "out1:32 ", delay=1.693, latency=0, II=1];
+}

@@ -35,7 +35,7 @@ architecture behavioral of getelementptr_op_5_1_32_32_00000000000000000000000000
 
 begin
 
-getelementptr_op_sub: entity work.getelementptr_op(arch) generic map (5,1,32,32,00000000000000000000000000000010)
+getelementptr_op_sub: entity work.getelementptr_op(arch) generic map (5,1,32,32,2)
 port map (
 	clk => clk,
 	rst => rst,

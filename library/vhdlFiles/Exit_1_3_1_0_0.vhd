@@ -32,7 +32,7 @@ architecture behavioral of Exit_1_3_1_0_0 is
 
 begin
 
-end_node_sub: entity work.end_node(arch) generic map (1,3,1,0,1)
+end_node_sub: entity work.end_node(arch) generic map (1,3,1,1,1)
 port map (
 	clk => clk,
 	rst => rst,

@@ -53,6 +53,11 @@ public class GenerateDatabase {
             System.out.println("-onlyBin - Generates only the binary databases of the databases already present This does not regenerate the databases.");
             System.out.println("-start <CLEL/CLEM tile name> - Generates the databases with start tile as the one mentioned. ");
             System.out.println("-end <CLEL/CLEM tile name> - Generates the databases with the end tile as the one mentioned.");
+            System.out.println("-part <arg> - Short part name (xcvu13p, xcvu9p, xck26, xczu3eg). Default: xcvu13p");
+            return;
+        }
+
+        if (!ch.agsl.dynarapid.GenerateDesign.setPartFromArgs(args)) {
             return;
         }
 

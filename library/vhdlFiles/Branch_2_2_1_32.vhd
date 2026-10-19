@@ -27,9 +27,14 @@ end Branch_2_2_1_32;
 
 architecture behavioral of Branch_2_2_1_32 is 
 
+	-- The branch copies its 1-bit data input to both outputs; output 0 is zero-extended to 32 bits
+	signal dataOut0_1bit : std_logic_vector(0 downto 0);
+
 begin
 
-Branch_sub: entity work.Branch(arch) generic map (2,2,1,32)
+	dataOutArray_0 <= (31 downto 1 => '0') & dataOut0_1bit;
+
+Branch_sub: entity work.Branch(arch) generic map (2,2,1,1)
 port map (
 	clk => clk,
 	rst => rst,
@@ -43,7 +48,7 @@ port map (
 	nReadyArray(1) => nReadyArray_1,
 	validArray(0) => validArray_0,
 	validArray(1) => validArray_1,
-	dataOutArray(0) => dataOutArray_0,
+	dataOutArray(0) => dataOut0_1bit,
 	dataOutArray(1) => dataOutArray_1
 );
 

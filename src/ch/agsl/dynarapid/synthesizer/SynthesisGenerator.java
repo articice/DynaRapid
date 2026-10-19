@@ -443,40 +443,46 @@ public class SynthesisGenerator {
     //This generates synthesized dcp using the vhdl files
     public static boolean generateSynthesisForNodeUsingVHDL(Node node, boolean exportLicense)
     {
-        StringUtils.printIntro("Trying synthesizing DCP: " + node.dcpName + " using VHDL method");
+        return generateSynthesisUsingVHDL(node.dcpName, exportLicense);
+    }
 
-        if(checkIfVHDLSynthDCPPresent(node.dcpName))
+    //Synthesizes a component directly from its pre-generated VHDL wrapper (library/vhdlFiles/<dcpName>.vhd), no dot file needed
+    public static boolean generateSynthesisUsingVHDL(String dcpName, boolean exportLicense)
+    {
+        StringUtils.printIntro("Trying synthesizing DCP: " + dcpName + " using VHDL method");
+
+        if(checkIfVHDLSynthDCPPresent(dcpName))
         {
-            System.out.println(node.dcpName + " has already been genered using the vhdl method");
+            System.out.println(dcpName + " has already been genered using the vhdl method");
             return true;
         }
 
-        if(!checkIfVHDLPresent(node.dcpName))
+        if(!checkIfVHDLPresent(dcpName))
         {
-            System.out.println("ERROR: Could not find the source vhdl files to synthesize DCP: " + node.dcpName);
+            System.out.println("ERROR: Could not find the source vhdl files to synthesize DCP: " + dcpName);
             return false;
         }
 
         String deviceName = GenerateDesign.fpga_part;
-        String nodeTclLine = "synth_design -mode out_of_context -flatten_hierarchy none -part " + deviceName + " -top " + node.dcpName;
+        String nodeTclLine = "synth_design -mode out_of_context -flatten_hierarchy none -part " + deviceName + " -top " + dcpName;
 
-        System.out.println("Generating tcl file for the synthesis of DCP: " + node.dcpName);
+        System.out.println("Generating tcl file for the synthesis of DCP: " + dcpName);
 
-        String tclLoc = SynthesisTclGenerator.tclGeneratorUsingVHDL(node.dcpName, nodeTclLine);
+        String tclLoc = SynthesisTclGenerator.tclGeneratorUsingVHDL(dcpName, nodeTclLine);
         if(tclLoc.equals(""))
         {
-            System.out.println("ERROR: Could not generate tcl file for the dcpName: " + node.dcpName + ". See above logs");
+            System.out.println("ERROR: Could not generate tcl file for the dcpName: " + dcpName + ". See above logs");
             return false;
         }
 
-        String logsLoc = LocationParser.vhdlSynthDCPs + node.dcpName + "_synth.report";
-        String errorReference = "Synth: " + node.dcpName;
+        String logsLoc = LocationParser.vhdlSynthDCPs + dcpName + "_synth.report";
+        String errorReference = "Synth: " + dcpName;
         int errorCode = 0;
 
         System.out.println("Running Vivado for the tcl file: " + tclLoc);
         if(!VivadoRun.vivadoRun(tclLoc, logsLoc, exportLicense, errorReference, errorCode))
         {
-            System.out.println("ERROR: Could not run vivado successfully for dcp: " + node.dcpName);
+            System.out.println("ERROR: Could not run vivado successfully for dcp: " + dcpName);
             return false;
         }
 
@@ -494,7 +500,7 @@ public class SynthesisGenerator {
             return false;
         }
 
-        System.out.println("Synthesized DCP for: " + node.dcpName);
+        System.out.println("Synthesized DCP for: " + dcpName);
         return true;
     }
 

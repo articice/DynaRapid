@@ -32,7 +32,7 @@ import java.io.*;
 public class ResourceElement implements Serializable
 {
     public static int starti = 60, startj = 0, endi = 89, endj = 147;  //Cordinates of the starting and ending tiles of the fpga where the pblock can be created
-    //START: CLEL_R_X0Y899 and END: CLEM_R_X147Y870
+    //START: CLEL_R_X0Y899 and END: CLEM_R_X147Y870 on xcvu13p. endj is reset to the last map column by MapBuilderFPGA (147 on xcvu13p, 107 on xcvu9p)
     public static ArrayList<ArrayList<ResourceElement>> ResourceMap = new ArrayList<>();
 
     public int clel, clem, dsp, bram;

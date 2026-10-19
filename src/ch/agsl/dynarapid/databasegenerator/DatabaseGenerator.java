@@ -67,7 +67,7 @@ public class DatabaseGenerator {
             String databaseLoc = LocationParser.getPlacedRoutedDCPsPath().resolve(dcpName + ".data").toString();
             FileWriter dataWriter = new FileWriter(new File(databaseLoc));
 
-            dataWriter.write(checkStrings[0] + sep + "xck26\n");
+            dataWriter.write(checkStrings[0] + sep + ch.agsl.dynarapid.GenerateDesign.fpga_part + "\n");
 
             if(!ComponentDatabase.printDatabase(dataWriter, dcpName, pblocks))
                 throw new Exception();

@@ -45,6 +45,39 @@ public class GenerateDesign {
     public static String fpga_part = "xcvu13p-fsga2577-1-i";
     public static String part= "xcvu13p";
 
+    //Maps the short part name (used for library folder names) to the full Vivado part number
+    public static boolean setPart(String shortName)
+    {
+        String full;
+        switch(shortName) {
+            case "xczu3eg": full = "xczu3eg-sbva484-1-e"; break; //Ultra96
+            case "xck26":   full = "xck26-sfvc784-2LV-c"; break; //Kria
+            case "xcvu13p": full = "xcvu13p-fsga2577-1-i"; break;
+            case "xcvu9p":  full = "xcvu9p-fsgd2104-2L-e"; break; //VCU1525 / BCU1525
+            default:
+                System.out.println("ERROR: Part number not currently supported: " + shortName);
+                return false;
+        }
+        part = shortName;
+        fpga_part = full;
+        System.out.println("Using part: " + part + " (" + fpga_part + ")");
+        return true;
+    }
+
+    //Applies the -part argument if present. Must be called before Start.start() since the map is built from the part
+    public static boolean setPartFromArgs(String args[])
+    {
+        int index = StringUtils.findInArray("-part", args);
+        if(index == -1)
+            return true;
+        if(index + 1 >= args.length)
+        {
+            System.out.println("ERROR: -part requires an argument");
+            return false;
+        }
+        return setPart(args[index + 1]);
+    }
+
     public static void deleteDirectory(File sourceDir)
     {
         for (File subfile : sourceDir.listFiles()) 
@@ -151,7 +184,9 @@ public class GenerateDesign {
             System.out.println("\tgreedy");
             System.out.println("-part <args> - Device part number. Options are:");
             System.out.println("\txcvu13p");
+            System.out.println("\txcvu9p");
             System.out.println("\txck26");
+            System.out.println("\txczu3eg");
             System.out.println("-center <arg> - Center of the design.");
             System.out.println("\t<arg> : Can be the name of SLICE site like SLICE_X#_Y#");
             System.out.println("\t<arg> : Can be R<row_number>_C<column_number>_Side<side>. The side can be -1 for left and +1 for right");
@@ -203,34 +238,8 @@ public class GenerateDesign {
         }
 
 
-        if(StringUtils.findInArray("-part", args) != -1)
-        {
-            GenerateDesign.part = args[StringUtils.findInArray("-part", args) + 1];
-
-            switch(part) {
-                case "xczu3eg":
-                    System.out.println("xczu3eg");
-                    GenerateDesign.fpga_part = "xczu3eg-sbva484-1-e"; //Utra96
-                    break;
-                case "xck26":
-                    System.out.println("xck26");
-                    GenerateDesign.fpga_part = "xck26-sfvc784-2LV-c"; //Kria
-                    break;
-                case "xcvu13p":
-                    System.out.println("xcvu13p");
-                    GenerateDesign.fpga_part = "xcvu13p-fsga2577-1-i";
-                    break;
-                default:
-                    System.out.println("Using default part-number xcvu13p");
-                    GenerateDesign.fpga_part = "xcvu13p-fsga2577-1-i";
-            }
-
-            if(part.equals(""))
-            {
-                System.out.println("ERROR: Part number not currently supported");
-                return;
-            }
-        }
+        if(!setPartFromArgs(args))
+            return;
 
         if(!Start.start("Design Generation"))
         return;

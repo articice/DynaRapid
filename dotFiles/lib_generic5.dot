@@ -1,0 +1,8 @@
+Digraph G {
+	splines=spline;
+		"shl_0" [type = "Operator", bbID= 1, op = "shl_op", in = "in1:32 in2:32 ", out = "out1:32 ", delay=0.000, latency=0, II=1];
+		"fork_0" [type = "Fork", bbID= 1, in = "in1:1", out = "out1:1 out2:1 out3:1 out4:1 out5:1 out6:1 out7:1 out8:1 "];
+		"tfifo_0" [type = "Buffer", bbID= 1, in = "in1:1", out = "out1:1", slots=3, transparent=true];
+		"tfifo_1" [type = "Buffer", bbID= 1, in = "in1:32", out = "out1:32", slots=2, transparent=true];
+		"tfifo_2" [type = "Buffer", bbID= 1, in = "in1:32", out = "out1:32", slots=3, transparent=true];
+}

@@ -65,6 +65,9 @@ public class LocationParser {
 
     public static final String RELEASE_VERSION = "0.1.1";
 
+    // Parts with a prebuilt library published as a GitHub release asset for RELEASE_VERSION
+    public static final java.util.Set<String> RELEASED_PARTS = java.util.Set.of("xcvu13p", "xck26");
+
     public static final String GH_RELEASE_DIR_URL = "https://github.com/AGS-L/DynaRapid/releases/download/";
 
     private static Path placedRoutedDCPsPath = null;
@@ -133,11 +136,29 @@ public class LocationParser {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        // Synthesized and intermediate DCPs are device specific, so each part gets its own sub-folder
+        preSynthDCPs = partSubDir(preSynthDCPs);
+        genericSynthDCPs = partSubDir(genericSynthDCPs);
+        vhdlSynthDCPs = partSubDir(vhdlSynthDCPs);
+        preExposedDCPs = partSubDir(preExposedDCPs);
+        exposedDCPs = partSubDir(exposedDCPs);
+    }
+
+    private static String partSubDir(String dir) {
+        String sub = dir + GenerateDesign.part + File.separator;
+        new File(sub).mkdirs();
+        return sub;
     }
 
     public static synchronized Path getPlacedRoutedDCPsPath() {
         if (placedRoutedDCPsPath == null) {
             String dirName = placedRoutedDCPs + File.separator + GenerateDesign.part + "-" + RELEASE_VERSION;
+            if (!new File(dirName).exists() && !RELEASED_PARTS.contains(GenerateDesign.part)) {
+                // No prebuilt library is published for this part, so it has to be generated locally
+                System.out.println("No prebuilt library for " + GenerateDesign.part + ". Creating empty library folder: " + dirName);
+                new File(dirName).mkdirs();
+            }
             if (!new File(dirName).exists()) {
                 // We need to download the placed and routed DCPs from GitHub
                 String zipFile = GenerateDesign.part + "-" + RELEASE_VERSION + ".zip";

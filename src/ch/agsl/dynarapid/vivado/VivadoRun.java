@@ -74,50 +74,39 @@ public class VivadoRun
 
         try { 
 
+            //Run through the shell directly (not the run_command_* helpers) so Vivado's exit code is preserved
             String sysCommand = "";
-            if(bash)
-                sysCommand = LocationParser.bin + "run_command_bash ";
-
-            else
-                sysCommand = LocationParser.bin + "run_command_tcsh ";
 
             if(exportLicense)
                 sysCommand += LocationParser.exportLicense + " && ";
 
             sysCommand += LocationParser.sourceVivado + " && ";
             //sysCommand += "vivado -mode batch -source " + tclLoc + " > " + logsLoc;
-            sysCommand += "/softs/xilinx/Vivado/2020.2/bin/vivado -mode batch -source " + tclLoc + " > " + logsLoc;
+            //stderr goes to a file so a full pipe cannot block Vivado, and timeout kills Vivado itself after 1 hour
+            String errLoc = logsLoc + ".stderr";
+            sysCommand += "timeout -k 60 3600 vivado -mode batch -nojournal -nolog -source " + tclLoc + " > " + logsLoc + " 2> " + errLoc;
 
             System.out.println("Running command: " + sysCommand);
 
-            Process p = Runtime.getRuntime().exec(sysCommand);
+            Process p = new ProcessBuilder(bash ? "bash" : "tcsh", "-c", sysCommand)
+                    .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                    .redirectError(ProcessBuilder.Redirect.DISCARD)
+                    .start();
+            int exitCode = p.waitFor();
 
-            //running a countdown of 1 hour to end the vivado process
-            boolean flag = false;
-            for(int i = 0; (i < 60) && (!flag); i++)
-            {
-                //1 minute process counts
-                long end = System.currentTimeMillis() + (60*1000);
-                while(System.currentTimeMillis() < end)
-                    if(isProcessTerminated(p))
-                    {
-                        flag = true;
-                        break;
-                    }
-            }
-
-            if(!flag) //taking a lot of time to execute
+            if(exitCode == 124 || exitCode == 137) //exit codes of timeout (TERM / KILL)
             {
                 System.out.println(tclLoc + " taking a lot of time to execute. Exiting process!");
                 ErrorLogger.addError(errorReference, errorCode + num, tclLoc + " taking a lot of time to execute. Exiting process!");
                 return 1; //continue execution even though one pblock took a lot of time
             }
 
-            InputStream errorStream = p.getErrorStream();
             String error = "";
-            int c = 0;
-            while ((c = errorStream.read()) != -1) {
-                error += Character.toString((char)c);
+            File errFile = new File(errLoc);
+            if(errFile.exists())
+            {
+                error = new String(java.nio.file.Files.readAllBytes(errFile.toPath()));
+                errFile.delete();
             }
 
             if(error.length() != 0)

@@ -69,8 +69,8 @@ public class MapBuilderFPGA
         try
         {
             System.out.println("Writing the map");
-            FileWriter deviceMap = new FileWriter(LocationParser.map + "deviceMap-xck26.csv");
-            deviceMap.write("Device: xck26 \n");
+            FileWriter deviceMap = new FileWriter(LocationParser.map + "deviceMap-" + GenerateDesign.fpga_part + ".csv");
+            deviceMap.write("Device: " + GenerateDesign.fpga_part + " \n");
             for(int i = 0; i < tempMap.size(); i++)
             {
                 
@@ -88,8 +88,8 @@ public class MapBuilderFPGA
             deviceMap.close();
 
             System.out.println("Writing Resource map");
-            FileWriter resourceFile =  new FileWriter(LocationParser.map + "resourceMap-xck26.csv");
-            resourceFile.write("Device: xck26, Start: CLEL_R_X0Y899, End: CLEM_R_X147Y870, l = CLEL, m = CLEM, d = DSP, b = BRAM, r = rows, c = columns\n");
+            FileWriter resourceFile =  new FileWriter(LocationParser.map + "resourceMap-" + GenerateDesign.fpga_part + ".csv");
+            resourceFile.write("Device: " + GenerateDesign.fpga_part + ", l = CLEL, m = CLEM, d = DSP, b = BRAM, r = rows, c = columns\n");
             for(int i = 0; i < resourceMap.size(); i++)
             {
                 
@@ -329,6 +329,7 @@ public class MapBuilderFPGA
         }
 
         omitRows();
+        ResourceElement.endj = MapElement.map.get(0).size() - 1; //pblock region spans the full width of the device
         ResourceElement.resourceMapBuilder();
         MapElement.populateMapMap();
         return true;
