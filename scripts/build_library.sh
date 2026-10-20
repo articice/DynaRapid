@@ -11,6 +11,7 @@
 # Restartable: finished components are marked in libbuild/<part>/state/<pass>/<name>.done
 # and are skipped on the next start. A component that is interrupted mid-way is redone.
 # Stop gracefully with:  touch libbuild/<part>/STOP   (workers exit after their current component)
+# PASSES="pass1" builds only the early library (default: "pass1 pass2").
 #
 set -u
 
@@ -20,6 +21,7 @@ WORKERS=${3:-2}
 PASS1_SHAPES=${PASS1_SHAPES:-3}
 MIN_FREE_MEM_GB=${MIN_FREE_MEM_GB:-10}
 JAVA_HEAP=${JAVA_HEAP:-6G}
+PASSES=${PASSES:-pass1 pass2}
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 BUILD=$ROOT/libbuild/$PART${BUILD_TAG:+-$BUILD_TAG}   # BUILD_TAG: separate state for a second build
@@ -106,7 +108,7 @@ build_component() { # <worker id> <pass> <name>
 
 worker() { # <worker id>
     local wid=$1
-    for pass in pass1 pass2; do
+    for pass in $PASSES; do
         mkdir -p "$BUILD/state/$pass"
         while true; do
             [ -e "$BUILD/STOP" ] && { log "w$wid stopping (STOP file present)"; return; }
@@ -130,7 +132,7 @@ worker() { # <worker id>
 # Claims left over from an interrupted run are redone
 rm -f "$BUILD"/state/pass*/*.claimed
 rm -f "$BUILD/STOP"
-log "build started: part=$PART workers=$WORKERS pass1_shapes=$PASS1_SHAPES variants=$(grep -c . "$BUILD/variants.txt")"
+log "build started: part=$PART workers=$WORKERS passes=\"$PASSES\" pass1_shapes=$PASS1_SHAPES variants=$(grep -c . "$BUILD/variants.txt")"
 for w in $(seq 1 "$WORKERS"); do
     worker "$w" &
     sleep 5
