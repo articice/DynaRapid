@@ -96,7 +96,7 @@ build_component() { # <worker id> <pass> <name>
     fi
 
     java_run "$wdir" "$logf" GenerateDatabase -m "$name"
-    if [ ! -e "$LIBDIR/$name.data" ]; then
+    if ! grep -q "^Pblock Name" "$LIBDIR/$name.data" 2>/dev/null; then
         cleanup_component "$name" "$wdir"
         log "w$wid $pass $name FAILED database (see $logf)"; return 1
     fi

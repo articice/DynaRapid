@@ -53,12 +53,20 @@ public class PblockDatabase {
         return Integer.parseInt(val);
     }
 
+    //The coordinates are the _I#_J#_R#_C# suffix. Matching it at the end keeps component names
+    //that contain _I, _J, _R or _C (new Dynamatic: _COUNTER, _BREAK_R, _INPUT_TYPE) from being read
+    private static final java.util.regex.Pattern COORDS =
+        java.util.regex.Pattern.compile("_I(\\d+)_J(\\d+)_R(\\d+)_C(\\d+)$");
+
     public static int[] getCoordinatesFromName(String pblockName) {
+        java.util.regex.Matcher m = COORDS.matcher(pblockName);
+        if (!m.find())
+            throw new IllegalArgumentException("pblock name without _I#_J#_R#_C# suffix: " + pblockName);
         int coord[] = new int [4];
-        coord[0] = getValue(pblockName, "_I");
-        coord[1] = getValue (pblockName, "_J");
-        coord[2] = getValue(pblockName, "_R") + coord[0] - 1;
-        coord[3] = getValue(pblockName, "_C") + coord[1] - 1;
+        coord[0] = Integer.parseInt(m.group(1));
+        coord[1] = Integer.parseInt(m.group(2));
+        coord[2] = Integer.parseInt(m.group(3)) + coord[0] - 1;
+        coord[3] = Integer.parseInt(m.group(4)) + coord[1] - 1;
         return coord;
     }
 

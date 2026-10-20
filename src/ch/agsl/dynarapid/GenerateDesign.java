@@ -342,7 +342,9 @@ public class GenerateDesign {
             sourceDir.mkdirs();
 
             File src = new File(dotLoc);
-            File dest = new File(LocationParser.designs + graphName + "/" + graphName + ".dot");
+            //keep .mlir: GraphGenerator picks the reader by extension
+            String ext = dotLoc.endsWith(".mlir") ? ".mlir" : ".dot";
+            File dest = new File(LocationParser.designs + graphName + "/" + graphName + ext);
             
             System.out.println("Copying dot file");
             if(!TimeProfiler.addAndStartTimeElement("Shifting Dot File", "Environment Creation"))
@@ -351,7 +353,7 @@ public class GenerateDesign {
             if(!dest.exists())
                 Files.copy(src.toPath(), dest.toPath());
 
-            dotLoc = LocationParser.designs + graphName + "/" + graphName + ".dot";
+            dotLoc = LocationParser.designs + graphName + "/" + graphName + ext;
             if(!TimeProfiler.endTimeElement("Shifting Dot File"));
 
             if(!placeLoc.equals(""))

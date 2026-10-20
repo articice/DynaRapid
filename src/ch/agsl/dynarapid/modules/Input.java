@@ -365,7 +365,9 @@ public class Input implements Serializable
         if(nReadyArray != null)
         {
             outputModuleInst = nReadyArray.node.moduleInst;
-            outputModuleInst.connect(ModulePorts.ReadyIn + nReadyArray.index, -1, inputModuleInst, ModulePorts.ReadyOut + index, -1);
+            //ready flows from this node to the producer, so this node's port goes first: ModuleInst.connect
+            //handles an output without a physical net (pass-thru, GND/VCC) only when it is the first port
+            inputModuleInst.connect(ModulePorts.ReadyOut + index, -1, outputModuleInst, ModulePorts.ReadyIn + nReadyArray.index, -1);
         }
 
         createInputPorts();
