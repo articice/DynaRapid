@@ -306,8 +306,9 @@ def main():
         if os.path.exists(path) and not force:
             kept += 1
             continue
-        with open(path, 'w') as f:
-            f.write(generate(variant, extern, parse_hw_ports(ports), entities, packages)[0])
+        text = generate(variant, extern, parse_hw_ports(ports), entities, packages)[0]
+        with open(path, 'w') as f:   # only after generate() succeeded: an empty file would count as present
+            f.write(text)
         made += 1
     print('%d variants written, %d already present (%s)' % (made, kept, out_dir))
 
