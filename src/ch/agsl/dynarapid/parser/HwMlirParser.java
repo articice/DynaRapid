@@ -22,7 +22,7 @@ import java.util.zip.CRC32;
  * hw.mlir has one hw.module per kernel (plus <kernel>_wrapper with the memory adapters, which the
  * shell replaces) holding one hw.instance per dataflow unit. Each instance refers to a
  * hw.module.extern whose hw.name and hw.parameters identify the RTL unit; that pair is the library
- * variant (dcpName), e.g. fork__DATA_TYPE_i32__SIZE_3.
+ * variant (dcpName), e.g. fork_DATA_TYPE_i32_SIZE_3.
  *
  * Ports:
  * - channel (!handshake.channel<iN>) and control (!handshake.control<>) ports become the node's
@@ -320,7 +320,9 @@ public class HwMlirParser {
     }
 
     /*
-     * Library variant name: unit name without "handshake.", then each parameter as __KEY_value.
+     * Library variant name: unit name without "handshake.", then each parameter as _KEY_value.
+     * The name is also the variant's VHDL entity, so it is a basic VHDL identifier: no "__", no
+     * leading or trailing '_' (parameter keys are upper case, which keeps the name readable).
      * Types print as i32/f32/ctrl, numbers without their type, strings without quotes; SMV_* parameters
  * (formal verification only) are left out.
      * Over maxVariantNameLength (e.g. the LSQ's per-instance configuration) the parameters
@@ -339,14 +341,15 @@ public class HwMlirParser {
             //SMV_*: names for the formal-verification (SMV) back end; they don't change the RTL
             if (item.substring(0, eq).startsWith("SMV_"))
                 continue;
-            name.append("__").append(item.substring(0, eq)).append('_').append(parameterValue(item.substring(eq + 3)));
+            name.append("_").append(item.substring(0, eq)).append('_').append(parameterValue(item.substring(eq + 3)));
         }
-        if (name.length() <= maxVariantNameLength)
-            return name.toString();
+        String full = name.toString().replaceAll("_+", "_").replaceAll("_$", "");
+        if (full.length() <= maxVariantNameLength)
+            return full;
 
         CRC32 crc = new CRC32();
         crc.update(parameters.getBytes());
-        return base + "__h" + String.format("%08x", crc.getValue());
+        return base + "_h" + String.format("%08x", crc.getValue());
     }
 
     static String parameterValue(String v) {
@@ -409,7 +412,8 @@ public class HwMlirParser {
 
     /*
      * Writes <out>_variants.tsv (one line per library variant: name, count, extern symbol,
-     * hw.name, parameters, ports) and <out>_ports.tsv (kernel port -> design ports).
+     * hw.name, parameters, ports), <out>_externs.tsv (every extern module used -> its variant)
+     * and <out>_ports.tsv (kernel port -> design ports).
      */
     public static void writeTables(Map<String, Node> nodes, String outPrefix) throws IOException {
         Map<String, Integer> counts = new TreeMap<>();
@@ -429,6 +433,13 @@ public class HwMlirParser {
                     ports.append(ports.length() == 0 ? "" : ", ").append(p.isInput ? "in " : "out ").append(p.name).append(" : ").append(p.type);
                 w.println(m.variantName + "\t" + counts.get(m.variantName) + "\t" + m.symbol + "\t" + m.unitName + "\t" + m.parameters + "\t" + ports);
             }
+        }
+
+        try (PrintWriter w = new PrintWriter(outPrefix + "_externs.tsv")) {
+            w.println("# extern\tvariant");
+            for (ExternModule m : externs.values())
+                if (counts.containsKey(m.variantName))
+                    w.println(m.symbol + "\t" + m.variantName);
         }
 
         try (PrintWriter w = new PrintWriter(outPrefix + "_ports.tsv")) {
