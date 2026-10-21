@@ -54,6 +54,7 @@ public class GenerateDesign {
             case "xck26":   full = "xck26-sfvc784-2LV-c"; break; //Kria
             case "xcvu13p": full = "xcvu13p-fsga2577-1-i"; break;
             case "xcvu9p":  full = "xcvu9p-fsgd2104-2L-e"; break; //VCU1525 / BCU1525
+            case "xcu55n":  full = "xcu55n-fsvh2892-2L-e"; break; //Varium C1100 (HBM)
             default:
                 System.out.println("ERROR: Part number not currently supported: " + shortName);
                 return false;
@@ -62,6 +63,20 @@ public class GenerateDesign {
         fpga_part = full;
         System.out.println("Using part: " + part + " (" + fpga_part + ")");
         return true;
+    }
+
+    //Default design center for the placers: a slice near the middle of the fabric they place into
+    public static String defaultCenterSite()
+    {
+        switch(fpga_part) {
+            case "xczu3eg-sbva484-1-e":
+            case "xck26-sfvc784-2LV-c":
+                return "SLICE_X37Y29"; //PR_1
+            case "xcu55n-fsvh2892-2L-e":
+                return "SLICE_X116Y120"; //middle of SLR0, the SLR with the HBM ports
+            default:
+                return "SLICE_X67Y624"; //xcvu13p; also exists on the xcvu9p
+        }
     }
 
     //Applies the -part argument if present. Must be called before Start.start() since the map is built from the part
@@ -185,6 +200,7 @@ public class GenerateDesign {
             System.out.println("-part <args> - Device part number. Options are:");
             System.out.println("\txcvu13p");
             System.out.println("\txcvu9p");
+            System.out.println("\txcu55n");
             System.out.println("\txck26");
             System.out.println("\txczu3eg");
             System.out.println("-center <arg> - Center of the design.");

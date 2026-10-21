@@ -96,7 +96,7 @@ public class RudimentaryPlacer implements Placer{
         int cols = MapElement.map.get(0).size();
         fabric = new Node [rows][cols];
 
-        String siteName = "SLICE_X67Y624"; //Near the center
+        String siteName = GenerateDesign.defaultCenterSite();
 
         centerSite = device.getSite(siteName);
         String tileName = centerSite.getTile().getName();

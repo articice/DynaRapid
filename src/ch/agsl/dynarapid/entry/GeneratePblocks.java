@@ -44,7 +44,7 @@ public class GeneratePblocks {
             System.out.println("-r - Removes all the files which were not successful");
             System.out.println("-num <arg> - Maximum number of shapes required from the pblock generator. If this argument is not present, maximum number of shapes are generated");
             System.out.println("-lic - If we need to add licence, add this argument");
-            System.out.println("-part <arg> - Short part name (xcvu13p, xcvu9p, xck26, xczu3eg). Default: xcvu13p");
+            System.out.println("-part <arg> - Short part name (xcvu13p, xcvu9p, xcu55n, xck26, xczu3eg). Default: xcvu13p");
             return;
         }
 

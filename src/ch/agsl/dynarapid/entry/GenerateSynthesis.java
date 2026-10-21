@@ -48,7 +48,7 @@ public class GenerateSynthesis {
             System.out.println("-m <arg> - Name of a single component to synthesize from library/vhdlFiles/<name>.vhd (only with -vhdl)");
             System.out.println("-list <arg> - Text file with one component name per line to synthesize from library/vhdlFiles (only with -vhdl)");
             System.out.println("-lic - If we need to add licence, add this argument");
-            System.out.println("-part <arg> - Short part name (xcvu13p, xcvu9p, xck26, xczu3eg). Default: xcvu13p");
+            System.out.println("-part <arg> - Short part name (xcvu13p, xcvu9p, xcu55n, xck26, xczu3eg). Default: xcvu13p");
             System.out.println("-unwrap - Generates just the pre-synthesized design without wrapping it. Can only be used with the generic field");
             System.out.println("-vhdl - This if added uses the V1 code to generate the synthesized dcp.");
             System.out.println("-generic - This if added uses the generic method for synthesis of the dcp. (Use cautiously since still under developement");
