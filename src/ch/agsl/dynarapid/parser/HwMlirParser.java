@@ -177,6 +177,9 @@ public class HwMlirParser {
         Map<Node, ExternModule> moduleOf = new LinkedHashMap<>();
         Map<Node, Map<String, String>> operandsOf = new HashMap<>();
         String output = null;
+        //result of a wire-only unit -> the value on the matching input
+        Map<String, String> aliases = new HashMap<>();
+        int bypassed = 0;
 
         for (Port p : kernelPorts)
             if (p.isInput) {
@@ -214,6 +217,30 @@ public class HwMlirParser {
                 operands.put(parts[0].trim(), parts[1].trim());
             }
 
+            String[] resultNames = results.isEmpty() ? new String[0] : results.split(",\\s*");
+
+            //Wire-only unit (no cells, see WireUnits): no node; its outputs are aliases of its inputs
+            int[] wire = WireUnits.channelMap(m.variantName);
+            if (wire != null) {
+                List<String> ins = new ArrayList<>();
+                List<String> outNames = new ArrayList<>();
+                int r = 0;
+                for (Port p : m.ports) {
+                    if (p.isClockOrReset())
+                        continue;
+                    if (p.channelWidth() < 0)
+                        throw new IllegalArgumentException(instName + "." + p.name + ": wire-only unit with a plain signal");
+                    if (p.isInput)
+                        ins.add(operands.get(p.name));
+                    else
+                        outNames.add(resultNames[r++].trim());
+                }
+                for (int k = 0; k < outNames.size(); k++)
+                    aliases.put(outNames.get(k), ins.get(wire[k]));
+                bypassed++;
+                continue;
+            }
+
             List<Integer> inWidths = new ArrayList<>(), outWidths = new ArrayList<>();
             List<Port> outs = new ArrayList<>();
             for (Port p : m.ports) {
@@ -233,7 +260,6 @@ public class HwMlirParser {
             moduleOf.put(node, m);
             operandsOf.put(node, operands);
 
-            String[] resultNames = results.isEmpty() ? new String[0] : results.split(",\\s*");
             if (resultNames.length != outs.size())
                 throw new IllegalArgumentException(instName + ": " + resultNames.length + " results for " + outs.size() + " outputs");
             int channelIndex = 0;
@@ -255,7 +281,7 @@ public class HwMlirParser {
             for (Port p : e.getValue().ports) {
                 if (!p.isInput || p.isClockOrReset())
                     continue;
-                String value = operands.get(p.name);
+                String value = resolve(aliases, operands.get(p.name));
                 Source src = values.get(value);
                 if (src == null)
                     throw new IllegalArgumentException(node.name + "." + p.name + ": undefined value " + value);
@@ -287,7 +313,7 @@ public class HwMlirParser {
                 kernelOuts.add(p);
         String[] outs = outValues.isEmpty() ? new String[0] : outValues.split(",\\s*");
         for (int i = 0; i < outs.length; i++) {
-            Source src = values.get(outs[i].trim());
+            Source src = values.get(resolve(aliases, outs[i].trim()));
             Port p = kernelOuts.get(i);
             if (src.kernelInput)
                 throw new IllegalArgumentException("kernel input " + src.port + " passed straight to output " + p.name);
@@ -297,8 +323,19 @@ public class HwMlirParser {
                 mapChannelPort(p.name, src.node.name, "dout_", "valid_out_", "ready_in_", src.channelIndex, p.channelWidth());
         }
 
+        if (bypassed > 0)
+            System.out.println(bypassed + " wire-only units bypassed (no blocks)");
         System.out.println("Kernel " + kernelName + ": " + nodes.size() + " units, " + new HashSet<>(variantNames(nodes)).size() + " variants");
         return nodes;
+    }
+
+    static String resolve(Map<String, String> aliases, String value) {
+        for (int n = 0; aliases.containsKey(value); n++) {
+            if (n > aliases.size())
+                throw new IllegalArgumentException("cycle of wire-only units at " + value);
+            value = aliases.get(value);
+        }
+        return value;
     }
 
     static void mapPort(String kernelPort, String designPort) {

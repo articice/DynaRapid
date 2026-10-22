@@ -8,19 +8,28 @@
 package ch.agsl.dynarapid.entry;
 
 import ch.agsl.dynarapid.modules.*;
+import ch.agsl.dynarapid.GenerateDesign;
 import ch.agsl.dynarapid.parser.*;
 
 import java.util.*;
 
 //Reads a new-Dynamatic hw.mlir and writes the library variants it needs and its port map:
-//  ReadHwMlir <hw.mlir> <output prefix>   ->  <prefix>_variants.tsv, <prefix>_ports.tsv
+//  ReadHwMlir <hw.mlir> <output prefix> [-part <part>]   ->  <prefix>_variants.tsv, <prefix>_ports.tsv
+//With -part, wire-only units (parser/WireUnits, from that part's synthesized library netlists) are
+//bypassed as in GenerateDesign and left out of the variant list.
 public class ReadHwMlir {
     public static void main(String args[]) throws Exception
     {
-        if(args.length != 2)
+        if(args.length != 2 && args.length != 4)
         {
-            System.out.println("usage: ReadHwMlir <hw.mlir> <output prefix>");
+            System.out.println("usage: ReadHwMlir <hw.mlir> <output prefix> [-part <part>]");
             System.exit(2);
+        }
+        if(args.length == 4)
+        {
+            if(!GenerateDesign.setPartFromArgs(args))
+                System.exit(2);
+            LocationParser.locationParser();
         }
 
         Map<String, Node> nodes = HwMlirParser.parser(args[0]);
