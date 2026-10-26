@@ -91,6 +91,8 @@ public class HwMlirParser {
     public static Map<String, Node> parser(String mlirLoc) {
         StringUtils.printIntro("Parsing " + mlirLoc);
         Input.exactBitwidths = true;
+        externs.clear();
+        portMap.clear();
 
         try {
             List<String> lines = Files.readAllLines(Paths.get(mlirLoc));
@@ -165,31 +167,30 @@ public class HwMlirParser {
         return ports;
     }
 
+    //One hw.instance of the kernel module
+    static class Instance {
+        String name;
+        ExternModule module;
+        Map<String, String> operands = new LinkedHashMap<>(); //port -> value
+        String[] results;
+        Boolean folded; //null: not decided yet
+        Node node;      //the instance's node, if it isn't folded
+    }
+
     static Map<String, Node> parseKernel(List<String> lines, int start) {
         String header = lines.get(start).trim();
         kernelName = symbolAfter(header, "hw.module @");
         int open = header.indexOf('(');
         kernelPorts = parsePortList(header.substring(open + 1, matchingParen(header, open)));
 
-        Map<String, Node> nodes = new LinkedHashMap<>();
-        Map<String, Source> values = new HashMap<>();
-        //instance -> (its extern module, its operand values by port name)
-        Map<Node, ExternModule> moduleOf = new LinkedHashMap<>();
-        Map<Node, Map<String, String>> operandsOf = new HashMap<>();
-        String output = null;
-        //result of a wire-only unit -> the value on the matching input
-        Map<String, String> aliases = new HashMap<>();
-        int bypassed = 0;
-
+        Kernel k = new Kernel();
         for (Port p : kernelPorts)
-            if (p.isInput) {
-                Source src = new Source();
-                src.kernelInput = true;
-                src.port = p.name;
-                values.put("%" + p.name, src);
-            }
+            if (p.isInput)
+                k.kernelInputs.put("%" + p.name, p);
 
-        //First pass: create the nodes and record what each result value is
+        //Read every instance first: whether a unit folds depends on its operands, which may be
+        //defined further down (loops)
+        String output = null;
         for (int i = start + 1; i < lines.size(); i++) {
             String s = lines.get(i).trim();
             if (s.equals("}"))
@@ -201,46 +202,45 @@ public class HwMlirParser {
             if (!s.contains("hw.instance \""))
                 continue;
 
+            Instance inst = new Instance();
             String results = s.contains(" = hw.instance") ? s.substring(0, s.indexOf(" = hw.instance")) : "";
             int q = s.indexOf("hw.instance \"") + "hw.instance \"".length();
-            String instName = s.substring(q, s.indexOf('"', q));
+            inst.name = s.substring(q, s.indexOf('"', q));
             String symbol = symbolAfter(s, "\" @");
-            ExternModule m = externs.get(symbol);
-            if (m == null)
-                throw new IllegalArgumentException("instance " + instName + " of unknown module @" + symbol);
+            inst.module = externs.get(symbol);
+            if (inst.module == null)
+                throw new IllegalArgumentException("instance " + inst.name + " of unknown module @" + symbol);
 
             int ob = s.indexOf('(', s.indexOf("\" @"));
-            Map<String, String> operands = new LinkedHashMap<>();
             for (String item : splitTopLevel(s.substring(ob + 1, matchingParen(s, ob)))) {
                 //port: %value: type
                 String[] parts = item.trim().split(":\\s*", 3);
-                operands.put(parts[0].trim(), parts[1].trim());
+                inst.operands.put(parts[0].trim(), parts[1].trim());
             }
+            inst.results = results.isEmpty() ? new String[0] : results.split(",\\s*");
+            for (int r = 0; r < inst.results.length; r++)
+                inst.results[r] = inst.results[r].trim();
+            List<Port> outs = new ArrayList<>();
+            for (Port p : inst.module.ports)
+                if (!p.isInput)
+                    outs.add(p);
+            if (inst.results.length != outs.size())
+                throw new IllegalArgumentException(inst.name + ": " + inst.results.length + " results for " + outs.size() + " outputs");
+            for (int r = 0; r < outs.size(); r++)
+                k.producer.put(inst.results[r], Map.entry(inst, outs.get(r)));
+            k.instances.add(inst);
+        }
 
-            String[] resultNames = results.isEmpty() ? new String[0] : results.split(",\\s*");
-
-            //Wire-only unit (no cells, see WireUnits): no node; its outputs are aliases of its inputs
-            int[] wire = WireUnits.channelMap(m.variantName);
-            if (wire != null) {
-                List<String> ins = new ArrayList<>();
-                List<String> outNames = new ArrayList<>();
-                int r = 0;
-                for (Port p : m.ports) {
-                    if (p.isClockOrReset())
-                        continue;
-                    if (p.channelWidth() < 0)
-                        throw new IllegalArgumentException(instName + "." + p.name + ": wire-only unit with a plain signal");
-                    if (p.isInput)
-                        ins.add(operands.get(p.name));
-                    else
-                        outNames.add(resultNames[r++].trim());
-                }
-                for (int k = 0; k < outNames.size(); k++)
-                    aliases.put(outNames.get(k), ins.get(wire[k]));
-                bypassed++;
+        //Fold what can be folded; everything else becomes a node
+        Map<String, Node> nodes = new LinkedHashMap<>();
+        Map<String, Source> values = new HashMap<>();
+        Map<String, Integer> folds = new TreeMap<>();
+        for (Instance inst : k.instances) {
+            if (k.decide(inst)) {
+                folds.merge(inst.module.unitName, 1, Integer::sum);
                 continue;
             }
-
+            ExternModule m = inst.module;
             List<Integer> inWidths = new ArrayList<>(), outWidths = new ArrayList<>();
             List<Port> outs = new ArrayList<>();
             for (Port p : m.ports) {
@@ -254,14 +254,11 @@ public class HwMlirParser {
                 }
             }
 
-            String description = instName + " @" + symbol + " (" + m.unitName + " {" + m.parameters + "})";
-            Node node = new Node(instName, m.unitName, m.variantName, inWidths, outWidths, description);
-            nodes.put(instName, node);
-            moduleOf.put(node, m);
-            operandsOf.put(node, operands);
+            String description = inst.name + " @" + m.symbol + " (" + m.unitName + " {" + m.parameters + "})";
+            Node node = new Node(inst.name, m.unitName, m.variantName, inWidths, outWidths, description);
+            inst.node = node;
+            nodes.put(inst.name, node);
 
-            if (resultNames.length != outs.size())
-                throw new IllegalArgumentException(instName + ": " + resultNames.length + " results for " + outs.size() + " outputs");
             int channelIndex = 0;
             for (int r = 0; r < outs.size(); r++) {
                 Source src = new Source();
@@ -269,38 +266,72 @@ public class HwMlirParser {
                 src.port = outs.get(r).name;
                 if (outs.get(r).channelWidth() >= 0)
                     src.channelIndex = channelIndex++;
-                values.put(resultNames[r].trim(), src);
+                values.put(inst.results[r], src);
             }
         }
+        for (Map.Entry<String, Port> e : k.kernelInputs.entrySet()) {
+            Source src = new Source();
+            src.kernelInput = true;
+            src.port = e.getValue().name;
+            values.put(e.getKey(), src);
+        }
 
-        //Second pass: connect the channel inputs
-        for (Map.Entry<Node, ExternModule> e : moduleOf.entrySet()) {
-            Node node = e.getKey();
-            Map<String, String> operands = operandsOf.get(node);
+        //Connect the channel inputs of the nodes through the (folded) wiring. Folding keeps every
+        //handshake with one reader (values have one use, and a folded unit passes its operand's on)
+        Set<String> read = new HashSet<>(k.readyHigh);
+        for (Instance inst : k.instances) {
+            if (inst.folded)
+                continue;
+            Node node = inst.node;
             int channelIndex = 0;
-            for (Port p : e.getValue().ports) {
+            for (Port p : inst.module.ports) {
                 if (!p.isInput || p.isClockOrReset())
                     continue;
-                String value = resolve(aliases, operands.get(p.name));
-                Source src = values.get(value);
-                if (src == null)
-                    throw new IllegalArgumentException(node.name + "." + p.name + ": undefined value " + value);
+                String value = inst.operands.get(p.name);
 
                 if (p.channelWidth() < 0) { //plain signal: must come from the kernel ports
+                    Source src = values.get(value);
+                    if (src == null)
+                        throw new IllegalArgumentException(node.name + "." + p.name + ": undefined value " + value);
                     if (!src.kernelInput)
                         throw new IllegalArgumentException(node.name + "." + p.name + ": plain signal between units is not supported");
                     mapPort(src.port, node.name + "_" + p.name + "_Port");
                     continue;
                 }
 
-                if (src.kernelInput)
-                    mapChannelPort(src.port, node.name, "din_", "valid_in_", "ready_out_", channelIndex, p.channelWidth());
-                else {
+                FoldedUnits.Wiring w = k.wiring(value);
+                Source src = w.handshake == null ? null : values.get(w.handshake);
+                if (w.handshake != null && src == null)
+                    throw new IllegalArgumentException(node.name + "." + p.name + ": undefined value " + w.handshake);
+                if (w.handshake != null && !read.add(w.handshake))
+                    throw new IllegalArgumentException(node.name + "." + p.name + ": the handshake of " + w.handshake + " has two readers");
+
+                //straight: the whole channel, bit for bit (a truncation keeps bits in place but is narrower)
+                boolean straight = w.handshake != null && w.isIdentity(w.handshake) && w.bits.length == k.width(w.handshake);
+                if (src != null && src.kernelInput) {
+                    if (straight)
+                        mapChannelPort(src.port, node.name, "din_", "valid_in_", "ready_out_", channelIndex, p.channelWidth());
+                    else { //a constant triggered by a kernel port
+                        mapChannelPort(src.port, node.name, null, "valid_in_", "ready_out_", channelIndex, 0);
+                        node.inputs.get(channelIndex).connectToWiring(null, w.bits, false);
+                    }
+                } else if (src == null)
+                    node.inputs.get(channelIndex).connectToWiring(null, w.bits, true);
+                else if (straight) {
                     node.connectInput(channelIndex, src.node, src.channelIndex);
                     src.node.connectOutput(src.channelIndex, node, channelIndex);
+                } else {
+                    Output out = src.node.outputs.get(src.channelIndex);
+                    Input in = node.inputs.get(channelIndex);
+                    in.connectToWiring(out, w.bits, false);
+                    out.connectToWiringInput(in, w.bits);
                 }
                 channelIndex++;
             }
+        }
+        for (String value : k.readyHigh) {
+            Source src = values.get(value);
+            src.node.outputs.get(src.channelIndex).tieReadyHigh();
         }
 
         //Kernel results
@@ -313,8 +344,15 @@ public class HwMlirParser {
                 kernelOuts.add(p);
         String[] outs = outValues.isEmpty() ? new String[0] : outValues.split(",\\s*");
         for (int i = 0; i < outs.length; i++) {
-            Source src = values.get(resolve(aliases, outs[i].trim()));
+            String value = outs[i].trim();
             Port p = kernelOuts.get(i);
+            if (p.channelWidth() >= 0) {
+                FoldedUnits.Wiring w = k.wiring(value);
+                if (w.handshake == null || !w.isIdentity(w.handshake) || w.bits.length != k.width(w.handshake))
+                    throw new IllegalArgumentException("kernel result " + p.name + " is folded wiring (" + w + "), not a unit's output");
+                value = w.handshake;
+            }
+            Source src = values.get(value);
             if (src.kernelInput)
                 throw new IllegalArgumentException("kernel input " + src.port + " passed straight to output " + p.name);
             if (src.channelIndex < 0)
@@ -323,19 +361,102 @@ public class HwMlirParser {
                 mapChannelPort(p.name, src.node.name, "dout_", "valid_out_", "ready_in_", src.channelIndex, p.channelWidth());
         }
 
-        if (bypassed > 0)
-            System.out.println(bypassed + " wire-only units bypassed (no blocks)");
+        if (!folds.isEmpty())
+            System.out.println("Folded into wiring (no blocks): " + folds);
         System.out.println("Kernel " + kernelName + ": " + nodes.size() + " units, " + new HashSet<>(variantNames(nodes)).size() + " variants");
         return nodes;
     }
 
-    static String resolve(Map<String, String> aliases, String value) {
-        for (int n = 0; aliases.containsKey(value); n++) {
-            if (n > aliases.size())
-                throw new IllegalArgumentException("cycle of wire-only units at " + value);
-            value = aliases.get(value);
+    //The kernel's instances, and the wiring of every channel value once units are folded
+    static class Kernel {
+        List<Instance> instances = new ArrayList<>();
+        Map<String, Port> kernelInputs = new LinkedHashMap<>();
+        Map<String, Map.Entry<Instance, Port>> producer = new HashMap<>(); //value -> instance and output port
+        Map<String, FoldedUnits.Wiring> wirings = new HashMap<>();
+        Set<String> readyHigh = new LinkedHashSet<>(); //values read by a folded sink
+        Set<Instance> deciding = new HashSet<>();
+
+        //Folds the instance if it can be (FoldedUnits, or a wire-only unit, see WireUnits)
+        boolean decide(Instance inst) {
+            if (inst.folded != null)
+                return inst.folded;
+            if (!deciding.add(inst))
+                throw new IllegalArgumentException("cycle of folded units at " + inst.name);
+
+            ExternModule m = inst.module;
+            Map<String, FoldedUnits.Wiring> folded = null;
+            if (FoldedUnits.isCandidate(m.unitName)) {
+                Map<String, FoldedUnits.Wiring> in = new HashMap<>();
+                Map<String, Integer> outWidths = new HashMap<>();
+                for (Port p : m.ports) {
+                    if (p.isClockOrReset())
+                        continue;
+                    if (p.channelWidth() < 0)
+                        throw new IllegalArgumentException(inst.name + "." + p.name + ": " + m.unitName + " with a plain signal");
+                    if (p.isInput)
+                        in.put(p.name, wiring(inst.operands.get(p.name)));
+                    else
+                        outWidths.put(p.name, p.channelWidth());
+                }
+                folded = FoldedUnits.fold(m.unitName, m.parameters, in, outWidths, kernelInputs::containsKey);
+                if (folded != null && m.unitName.equals("handshake.sink")) {
+                    String h = in.get("ins").handshake;
+                    if (h != null)
+                        readyHigh.add(h);
+                }
+            } else {
+                //Wire-only unit (no cells, see WireUnits): its outputs are wired to its inputs
+                int[] wire = WireUnits.channelMap(m.variantName);
+                if (wire != null) {
+                    List<FoldedUnits.Wiring> ins = new ArrayList<>();
+                    List<String> outNames = new ArrayList<>();
+                    for (Port p : m.ports) {
+                        if (p.isClockOrReset())
+                            continue;
+                        if (p.channelWidth() < 0)
+                            throw new IllegalArgumentException(inst.name + "." + p.name + ": wire-only unit with a plain signal");
+                        if (p.isInput)
+                            ins.add(wiring(inst.operands.get(p.name)));
+                        else
+                            outNames.add(p.name);
+                    }
+                    folded = new HashMap<>();
+                    for (int o = 0; o < outNames.size(); o++)
+                        folded.put(outNames.get(o), ins.get(wire[o]));
+                }
+            }
+
+            deciding.remove(inst);
+            inst.folded = folded != null;
+            if (folded != null) {
+                int r = 0;
+                for (Port p : m.ports)
+                    if (!p.isInput)
+                        wirings.put(inst.results[r++], folded.get(p.name));
+            }
+            return inst.folded;
         }
-        return value;
+
+        //Data width of a value of a real unit or a kernel port
+        int width(String value) {
+            Map.Entry<Instance, Port> def = producer.get(value);
+            Port port = def != null ? def.getValue() : kernelInputs.get(value);
+            return Math.max(port.channelWidth(), 0);
+        }
+
+        //The wiring of a channel value: what it was folded to, or the value itself
+        FoldedUnits.Wiring wiring(String value) {
+            FoldedUnits.Wiring w = wirings.get(value);
+            if (w != null)
+                return w;
+            Map.Entry<Instance, Port> def = producer.get(value);
+            Port port = def != null ? def.getValue() : kernelInputs.get(value);
+            if (port == null)
+                throw new IllegalArgumentException("undefined value " + value);
+            if (def != null && decide(def.getKey()))
+                return wirings.get(value);
+            return FoldedUnits.Wiring.identity(value, Math.max(port.channelWidth(), 0));
+        }
     }
 
     static void mapPort(String kernelPort, String designPort) {
@@ -343,7 +464,7 @@ public class HwMlirParser {
     }
 
     static void mapChannelPort(String kernelPort, String node, String data, String valid, String ready, int index, int width) {
-        if (width > 0)
+        if (width > 0 && data != null)
             mapPort(kernelPort, node + "_" + data + index);
         mapPort(kernelPort, node + "_" + valid + index);
         mapPort(kernelPort, node + "_" + ready + index);

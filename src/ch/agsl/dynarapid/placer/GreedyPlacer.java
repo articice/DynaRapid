@@ -288,7 +288,7 @@ public class GreedyPlacer implements Placer {
                 //checking all the inputs of node
                 for(Input in : node.inputs)
                 {
-                    if(in.validArray == null) //Means a starting node
+                    if(in.validArray == null || in.validArray.node == null) //Means a starting node (or always valid: a folded source)
                         continue;
 
                     Node outputNode = in.validArray.node;
@@ -303,7 +303,7 @@ public class GreedyPlacer implements Placer {
                 //checking all the outputs of the node
                 for(Output out : node.outputs)
                 {
-                    if(out.pValidArray == null) //Means a ending node
+                    if(out.pValidArray == null || out.pValidArray.node == null) //Means a ending node (or a folded sink)
                         continue;
 
                     Node inputNode = out.pValidArray.node;
@@ -469,7 +469,7 @@ public class GreedyPlacer implements Placer {
         //checking all the inputs of node
         for(Input in : node.inputs)
         {
-            if(in.validArray == null) //Means a starting node
+            if(in.validArray == null || in.validArray.node == null) //Means a starting node (or always valid: a folded source)
                 continue;
 
             Node outputNode = in.validArray.node;
@@ -489,7 +489,7 @@ public class GreedyPlacer implements Placer {
         //checking all the outputs of node
         for(Output out : node.outputs)
         {
-            if(out.pValidArray == null) //Means a ending node
+            if(out.pValidArray == null || out.pValidArray.node == null) //Means a ending node (or a folded sink)
                         continue;
 
             Node inputNode = out.pValidArray.node;

@@ -31,7 +31,9 @@ import com.xilinx.rapidwright.design.Design;
 import com.xilinx.rapidwright.design.Module;
 import com.xilinx.rapidwright.design.ModuleInst;
 import com.xilinx.rapidwright.design.Net;
+import com.xilinx.rapidwright.design.NetType;
 import com.xilinx.rapidwright.design.Port;
+import com.xilinx.rapidwright.design.PortType;
 import com.xilinx.rapidwright.design.SiteInst;
 import com.xilinx.rapidwright.design.SitePinInst;
 import com.xilinx.rapidwright.device.Device;
@@ -44,6 +46,7 @@ import com.xilinx.rapidwright.edif.EDIFCell;
 import com.xilinx.rapidwright.edif.EDIFDirection;
 import com.xilinx.rapidwright.edif.EDIFNet;
 import com.xilinx.rapidwright.edif.EDIFNetlist;
+import com.xilinx.rapidwright.edif.EDIFTools;
 import com.xilinx.rapidwright.tests.CodePerfTracker;
 import com.xilinx.rapidwright.examples.SLRCrosserGenerator;
 import com.xilinx.rapidwright.router.Router;
@@ -85,6 +88,11 @@ public class Input implements Serializable
     public Output [] dataOutArray; //The dataInArray of this bundle is connected to which dataOutArray
     public Output validArray = null; //The pValidArray of this bundle is connected to which validArray
     public Output nReadyArray = null; //The readyArray (which is output) of this bundle is connected to which nReadyArray of which output bundle
+    //Folded wiring (connectToWiring): data bit i is bit dataOutBit[i] of dataOutArray[i] (or GND/VCC);
+    //null: bit i of the output (legacy graphs)
+    public int[] dataOutBit = null;
+    //The channel is always valid (validArray is VCC) and nobody reads its ready: no port for it
+    public boolean readyUnused = false;
 
     //Constructor to initialise the dangling input
     private Input()
@@ -164,6 +172,100 @@ public class Input implements Serializable
         nReadyArray = outputNode.outputs.get(outputIndex);
     }
 
+    //Connects this input to a folded channel (parser/FoldedUnits): data bit i is bit bits[i] of out,
+    //or a constant (FoldedUnits.ZERO/ONE). out == null: no unit drives the handshake; it is always
+    //valid (alwaysValid, a source: valid tied high, ready unused) or comes from kernel ports.
+    public void connectToWiring(Output out, int[] bits, boolean alwaysValid)
+    {
+        if(bits.length != bitSize)
+            throw new IllegalArgumentException(node.name + " input " + index + ": " + bits.length + " bits wired to " + bitSize);
+        dataOutBit = bits.clone();
+        for(int i = 0; i < bitSize; i++)
+        {
+            if(bits[i] == FoldedUnits.ZERO)
+                dataOutArray[i] = Output.GND;
+            else if(bits[i] == FoldedUnits.ONE)
+                dataOutArray[i] = Output.VCC;
+            else if(out == null)
+                throw new IllegalArgumentException(node.name + " input " + index + ": data bit " + i + " without a driver");
+            else
+                dataOutArray[i] = out;
+        }
+        validArray = alwaysValid ? Output.VCC : out;
+        nReadyArray = out;
+        readyUnused = alwaysValid;
+    }
+
+    //Ties a pin of a placed module instance to GND or VCC: logically to the netlist's static net,
+    //physically its site pins to the design's static net (the router reaches them from the tie-offs)
+    public static void tieToStatic(ModuleInst moduleInst, String portName, int busIndex, boolean one)
+    {
+        EDIFNetlist netlist = moduleInst.getDesign().getNetlist();
+        EDIFNet logical = EDIFTools.getStaticNet(one ? NetType.VCC : NetType.GND, netlist.getTopCell(), netlist);
+        logical.createPortInst(portName, member(moduleInst, portName, busIndex), moduleInst.getCellInst());
+
+        Port port = moduleInst.getPort(busIndex == -1 ? portName : portName + "[" + busIndex + "]");
+        if(port == null)
+            return; //the pin goes nowhere inside the module
+        Net physical = one ? moduleInst.getDesign().getVccNet() : moduleInst.getDesign().getGndNet();
+        for(SitePinInst pin : moduleInst.getCorrespondingPins(port))
+        {
+            Net old = pin.getNet();
+            if(old != null)
+                old.removePin(pin, true);
+            physical.addPin(pin);
+        }
+    }
+
+    /*
+     * Connects bit outBit of an output port to bit inBit of an input port (-1: single-bit port), both
+     * by their names (port[i]), logically and physically. ModuleInst.connect takes its bus indices as
+     * EDIF member indices for the logical netlist (member 0 of a [w-1:0] bus is bit w-1) but as bit
+     * names for the physical one: the two agree only on a straight connection between buses of the
+     * same width, which is all that legacy graphs make. An output bit may feed several input bits.
+     */
+    public static void connectBit(ModuleInst outInst, String outPort, int outBit, ModuleInst inInst, String inPort, int inBit)
+    {
+        EDIFCell top = outInst.getCellInst().getParentCell();
+        String netName = outInst.getName() + underscore + outPort + (outBit == -1 ? "" : "_bit" + outBit);
+        EDIFNet net = top.getNet(netName);
+        if(net == null)
+        {
+            net = top.createNet(netName);
+            net.createPortInst(outPort, member(outInst, outPort, outBit), outInst.getCellInst());
+        }
+        net.createPortInst(inPort, member(inInst, inPort, inBit), inInst.getCellInst());
+
+        //Physical pins, as in ModuleInst.connect
+        Port out = outInst.getPort(outBit == -1 ? outPort : outPort + "[" + outBit + "]");
+        Port in = inInst.getPort(inBit == -1 ? inPort : inPort + "[" + inBit + "]");
+        if(out == null || in == null)
+            return;
+        Net physical = outInst.getCorrespondingNet(out);
+        if(physical == null)
+        {
+            if(out.getType() == PortType.POWER)
+                physical = outInst.getDesign().getVccNet();
+            else if(out.getType() == PortType.GROUND)
+                physical = outInst.getDesign().getGndNet();
+            else
+                return; //unconnected or pass-thru: the logical netlist is enough
+        }
+        for(SitePinInst pin : inInst.getCorrespondingPins(in))
+        {
+            Net old = pin.getNet();
+            if(old != null)
+                old.removePin(pin, true);
+            physical.addPin(pin);
+        }
+    }
+
+    //EDIF member index of bit `bit` of a port of the module instance's cell (-1: single-bit port)
+    static int member(ModuleInst moduleInst, String portName, int bit)
+    {
+        return bit == -1 ? -1 : moduleInst.getCellInst().getPort(portName).getPortIndexFromNameIndex(bit);
+    }
+
     //This helps remove the input connection from the input
     //This helps if the output node is to be removed
     public void removeOutputConnection()
@@ -205,7 +307,7 @@ public class Input implements Serializable
     public AdjustmentBuffer getAdjustmentBufferForBitwidthMismatch()
     {
         System.out.println("Checking connections for bitwidth mismatch of node: " + node.name + " of index: " + index);
-        if(bitSize == 0)
+        if(bitSize == 0 || dataOutBit != null) //folded wiring is exact bit for bit
             return null;
 
         if(dataOutArray[0] == null)
@@ -225,7 +327,7 @@ public class Input implements Serializable
         //0 is taken as a sample port. We can use anny pin which follows: 0 <= pinNum < bitSize
         System.out.println("Checking connections for bitwidth mismatch of node: " + node.name + " of index: " + index);
 
-        if(bitSize == 0)
+        if(bitSize == 0 || dataOutBit != null) //folded wiring is exact bit for bit
             return;
 
         if(dataOutArray[0] == null)
@@ -306,7 +408,7 @@ public class Input implements Serializable
         }
         
         //for readyArray
-        if(nReadyArray == null)
+        if(nReadyArray == null && !readyUnused)
         {
             top.createPort(node.name + underscore + ReadyIn_name + index + Port_name, EDIFDirection.OUTPUT, 1);
             node.moduleInst.connect(ModulePorts.ReadyOut + index, -1, null, node.name + underscore + ReadyIn_name + index + Port_name, -1);
@@ -329,33 +431,37 @@ public class Input implements Serializable
         //Connecting the dataInArray
         for(int i = 0; i < bitSize; i++)
         {
-            if((dataOutArray[i] == Output.GND) || (dataOutArray[i] == Output.VCC) || (dataOutArray[i] == null))
+            if(dataOutArray[i] == null)
                  continue;
-
-            outputModuleInst = dataOutArray[i].node.moduleInst;
 
             int inputIndex = (bitSize > 1) ? i : -1;
 
-            int outputIndex = i;
+            if((dataOutArray[i] == Output.GND) || (dataOutArray[i] == Output.VCC))
+            {
+                tieToStatic(inputModuleInst, ModulePorts.DataIn + index, inputIndex, dataOutArray[i] == Output.VCC);
+                continue;
+            }
+
+            outputModuleInst = dataOutArray[i].node.moduleInst;
+
+            int outputIndex = (dataOutBit != null) ? dataOutBit[i] : i;
             if(dataOutArray[i].bitSize == 1)
                 outputIndex = -1;
 
-            else if(dataOutArray[i].bitSize <= i)
+            else if(dataOutBit == null && dataOutArray[i].bitSize <= i)
                 outputIndex = 0;
 
-            if ( node.constant_input && index == node.constant_input_index ) 
-            {
-                System.out.println("Stitching the inputs of the node: " + node.name + " of index: " + index + "to value " + node.constant_value);
-                outputModuleInst.connect(ModulePorts.DataOut + dataOutArray[i].index, outputIndex, inputModuleInst, ModulePorts.DataIn + index, inputIndex);
-            }   
+            if(dataOutBit != null)
+                connectBit(outputModuleInst, ModulePorts.DataOut + dataOutArray[i].index, outputIndex, inputModuleInst, ModulePorts.DataIn + index, inputIndex);
             else
-            {
                 outputModuleInst.connect(ModulePorts.DataOut + dataOutArray[i].index, outputIndex, inputModuleInst, ModulePorts.DataIn + index, inputIndex);
-           }
         }
 
         //Connecting the pValidArray
-        if(validArray != null)
+        if(validArray == Output.VCC)
+            tieToStatic(inputModuleInst, ModulePorts.ValidIn + index, -1, true);
+
+        else if(validArray != null)
         {
             outputModuleInst = validArray.node.moduleInst;
             outputModuleInst.connect(ModulePorts.ValidOut + validArray.index, -1, inputModuleInst, ModulePorts.ValidIn + index, -1);

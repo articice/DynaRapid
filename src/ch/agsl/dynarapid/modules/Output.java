@@ -82,6 +82,8 @@ public class Output implements Serializable
     public Input [] dataInArray; //The dataOutArray of this output bundle is connected to which input dataInArray
     public Input pValidArray = null; //The validArray of this output bundle is connected to which input pValidArray
     public Input readyArray = null; //The nReadyArray (input pin) of this output bundle is connected to which readyArray of which input bundle
+    //Read by a folded sink (parser/FoldedUnits): nReadyArray is tied high, valid and data go nowhere
+    public boolean readyHigh = false;
 
     private Output(String name) //This constructor is for initialising the VCC and GND Outputs only
     {
@@ -164,6 +166,30 @@ public class Output implements Serializable
 
         pValidArray = inputNode.inputs.get(inputIndex);
         readyArray = inputNode.inputs.get(inputIndex);
+    }
+
+    //Connects this output to an input through a folded channel (Input.connectToWiring): only the data
+    //bits listed in bits are read; the others go nowhere (Input.dangling, no port)
+    public void connectToWiringInput(Input in, int[] bits)
+    {
+        for(int i = 0; i < dataInArray.length; i++)
+            dataInArray[i] = Input.dangling;
+        for(int b : bits)
+            if(b >= 0)
+                dataInArray[b] = in;
+
+        pValidArray = in;
+        readyArray = in;
+    }
+
+    //This output is read by a folded sink: always ready, nothing else connected
+    public void tieReadyHigh()
+    {
+        for(int i = 0; i < dataInArray.length; i++)
+            dataInArray[i] = Input.dangling;
+
+        pValidArray = Input.dangling;
+        readyHigh = true;
     }
 
     //This diconnects the output from the input connections.
@@ -271,7 +297,10 @@ public class Output implements Serializable
         }
 
         //for the nReadyArray
-        if(readyArray == null)
+        if(readyHigh)
+            Input.tieToStatic(node.moduleInst, ModulePorts.ReadyIn + index, -1, true);
+
+        else if(readyArray == null)
         {
             if ( node.name.equals("ret0") )
             {
