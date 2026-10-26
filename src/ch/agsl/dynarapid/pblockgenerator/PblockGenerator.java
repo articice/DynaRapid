@@ -84,8 +84,8 @@ public class PblockGenerator
 
         int i = ResourceElement.starti;
 
-        //Traverse through all starting sites
-        for(int j = (ResourceElement.endj - 1); j > ResourceElement.startj; j--)
+        //Traverse through all starting sites, most relocatable first (see startColumns)
+        for(int j : startColumns(i))
         {
             StringUtils.printIntro("Starting Location I = " + i + " J = " + j);
             if(!incrementRows(i, j))
@@ -107,6 +107,47 @@ public class PblockGenerator
         else   
             System.out.println("ERROR: Code ended incorrectly. See above logs");
 
+    }
+
+    //Columns a pblock spans are compared over this many map columns when ranking start columns
+    static final int PATTERN_COLUMNS = 3;
+
+    /*
+     * Start columns for pblock generation, in the order to try them. A shape can only be relocated to
+     * columns with the same resource pattern, so columns whose pattern repeats most across the device
+     * come first (ties: nearest the middle). With a small shape budget (pass 1) the old order, from the
+     * right edge leftwards, put every shape of a variant in a rare edge pattern on some parts (xcu55n:
+     * 3 shapes at columns 145-146, ~5k valid places, versus ~50k+ in common columns).
+     * -Ddynarapid.pblockScan=edge restores the old order.
+     */
+    static List<Integer> startColumns(int i)
+    {
+        List<Integer> cols = new ArrayList<>();
+        for(int j = (ResourceElement.endj - 1); j > ResourceElement.startj; j--)
+            cols.add(j);
+        if("edge".equals(System.getProperty("dynarapid.pblockScan")))
+            return cols;
+
+        ArrayList<MapElement> row = MapElement.map.get(i);
+        Map<Integer, String> key = new HashMap<>();
+        Map<String, Integer> count = new HashMap<>();
+        for(int j : cols)
+        {
+            StringBuilder k = new StringBuilder();
+            for(int c = 0; c < PATTERN_COLUMNS; c++)
+            {
+                MapElement e = (j + c < row.size()) ? row.get(j + c) : null;
+                k.append(e == null ? "-" : e.leftElementRootname + "/" + e.rightElementRootname).append('|');
+            }
+            key.put(j, k.toString());
+            count.merge(k.toString(), 1, Integer::sum);
+        }
+        int mid = (ResourceElement.startj + ResourceElement.endj) / 2;
+        cols.sort(Comparator.<Integer>comparingInt(j -> -count.get(key.get(j))).thenComparingInt(j -> Math.abs(j - mid)));
+        System.out.println("Pblock start columns, most common pattern first: " + cols.subList(0, Math.min(8, cols.size()))
+                + " (pattern of column " + cols.get(0) + " occurs " + count.get(key.get(cols.get(0))) + " times; of column "
+                + (ResourceElement.endj - 1) + ", " + count.get(key.get(ResourceElement.endj - 1)) + ")");
+        return cols;
     }
 
     //For the given i and j in the map, it gives the minimum number of columns the pblock can have
