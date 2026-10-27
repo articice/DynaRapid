@@ -68,6 +68,33 @@ public class PblockGenerator
     public boolean licence;
 
     /*
+     * Logic sites (CLEL + CLEM) a pblock must have, as a fraction the unit fills: a pblock is first
+     * tried at about this utilization rather than at an exact fit, then grown by GROWTH of its columns
+     * per routing failure. An exact fit routes for small units (columns are coarse at their size), but
+     * a large LUT-bound unit fails at it for hours: the LSQ of histogram (8452 LUTs) filled its first
+     * pblocks to 95% and failed every route, one column added per hour-long attempt.
+     * 0 (the default): 1.0 for units of up to LARGE_UNIT_SITES logic sites, LARGE_UNIT_UTILIZATION above.
+     * GeneratePblocks -util <fraction> sets it.
+     */
+    public static double utilization = 0;
+    public static final int LARGE_UNIT_SITES = 200;
+    public static final double LARGE_UNIT_UTILIZATION = 0.75;
+    public static final double GROWTH = 0.1;
+    //Most map columns per row for a large unit's pblock (about 2:1 wide in sites)
+    public static final int MAX_ASPECT = 1;
+    //component.dcp with the logic sites scaled to the target utilization
+    public ResourceElement need;
+
+    static ResourceElement required(ResourceElement dcp, double util)
+    {
+        int logic = dcp.clel + dcp.clem;
+        double u = (util > 0) ? util : ((logic > LARGE_UNIT_SITES) ? LARGE_UNIT_UTILIZATION : 1.0);
+        //CLEM-only resources stay as they are; the margin goes to the sites either kind can serve
+        int clel = (int) Math.ceil(logic / u) - dcp.clem;
+        return new ResourceElement(clel, dcp.clem, dcp.dsp, dcp.bram);
+    }
+
+    /*
      * Pblock generator which generates the pblocks with all the pins exposed
      * @param d Name of teh component
      * @param r True if the unsuccessful pblocks are to be removed and false if they are not to be removed.
@@ -76,6 +103,8 @@ public class PblockGenerator
     public PblockGenerator (String d, boolean r, boolean s, int num, boolean licence)
     {
         component = new Component(d, licence);
+        need = required(component.dcp, utilization);
+        System.out.println("Pblock logic sites required: " + (need.clel + need.clem) + " for " + (component.dcp.clel + component.dcp.clem) + " used");
         remove = r;
         shorten = s;
         status = true;
@@ -255,7 +284,7 @@ public class PblockGenerator
         //Checking if pblock reduction is even possible or not
         ResourceElement resourceElement = ResourceElement.getPblock(i, j, i + rows - 1, j + currCol - 1);
 
-        if(!resourceElement.isPblockAppropriate(component.dcp))
+        if(!resourceElement.isPblockAppropriate(need))
         {
             System.out.println("Cannot reduce any more columns");
             return maxCol;
@@ -268,7 +297,7 @@ public class PblockGenerator
             System.out.print(currCol + ", \t");
             ResourceElement tempResourceElement = ResourceElement.getPblock(i, j, i + rows - 1, j + currCol - 1);
 
-            if(tempResourceElement.isPblockAppropriate(component.dcp))
+            if(tempResourceElement.isPblockAppropriate(need))
             {
                 resourceElement = tempResourceElement;
                 currCol--;
@@ -285,7 +314,7 @@ public class PblockGenerator
         if(currCol < minCol)
             currCol++;
 
-        if(resourceElement.isFirstColRemovable(component.dcp))
+        if(resourceElement.isFirstColRemovable(need))
         {
             System.out.println("Could not form pblock since first column is removable. Going to next row");
             if(currCol == minCol)
@@ -294,6 +323,17 @@ public class PblockGenerator
                 return minCol;
             }
 
+            return maxCol;
+        }
+
+        /*
+         * A large unit in a flat strip (histogram's LSQ: 13 rows by 69 columns, half the device wide) has
+         * long routes through a few rows and runs into the timeout; it is tried from the squarer shapes
+         * of more rows instead. A map column holds two sites (one each side of an interconnect column).
+         */
+        if((need.clel + need.clem > LARGE_UNIT_SITES) && (currCol > MAX_ASPECT * rows))
+        {
+            System.out.println("Pblock of " + rows + " rows and " + currCol + " columns is too flat for this unit. Going to next row");
             return maxCol;
         }
 
@@ -332,10 +372,11 @@ public class PblockGenerator
                 return maxCol;
 
             //Routing problems
-            currCol++;
+            currCol += Math.max(1, (int) Math.ceil(currCol * GROWTH));
         }
 
         System.out.println("Could not generate pblock with given number of rows. Going to next rows");
-        return currCol;
+        //growth can step past maxCol, the columns available from j
+        return maxCol;
     }
 }

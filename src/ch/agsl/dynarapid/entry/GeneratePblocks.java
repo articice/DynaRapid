@@ -43,6 +43,7 @@ public class GeneratePblocks {
             System.out.println("-q - Quick run of the pblock generator. Runs only with pin-exposed flow");
             System.out.println("-r - Removes all the files which were not successful");
             System.out.println("-num <arg> - Maximum number of shapes required from the pblock generator. If this argument is not present, maximum number of shapes are generated");
+            System.out.println("-util <fraction> - Logic utilization pblocks are first tried at (default: 1.0 up to " + PblockGenerator.LARGE_UNIT_SITES + " logic sites, " + PblockGenerator.LARGE_UNIT_UTILIZATION + " above)");
             System.out.println("-lic - If we need to add licence, add this argument");
             System.out.println("-part <arg> - Short part name (xcvu13p, xcvu9p, xcu55n, xck26, xczu3eg). Default: xcvu13p");
             return;
@@ -67,6 +68,8 @@ public class GeneratePblocks {
         if(StringUtils.findInArray("-q", args) != -1) quick = true;
         if(StringUtils.findInArray("-lic", args) != -1) lic = true;
         if(numOfShapesIndex != -1) numOfShapes = Integer.parseInt(args[numOfShapesIndex + 1]);
+        int utilIndex = StringUtils.findInArray("-util", args);
+        if(utilIndex != -1) PblockGenerator.utilization = Double.parseDouble(args[utilIndex + 1]);
 
         ArrayList<String> moduleNames = new ArrayList<>();
 
