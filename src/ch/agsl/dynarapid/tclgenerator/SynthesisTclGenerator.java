@@ -95,6 +95,18 @@ public class SynthesisTclGenerator {
             String srcVHDLFilesLoc = LocationParser.srcVHDLFiles;
             String vhdlFiles = LocationParser.vhdlFiles;
 
+            //Xilinx IP cores of the variant (scripts/xilinx_ip.py): <variant>.ip.tcl creates them with
+            //create_ip for $ip_part, in the in-memory project, to be synthesized with the variant
+            File ipTcl = new File(vhdlFiles + dcpName + ".ip.tcl");
+            if(ipTcl.exists())
+            {
+                tclFileWriter.write("create_project -in_memory -part " + ch.agsl.dynarapid.GenerateDesign.fpga_part + "\n");
+                tclFileWriter.write("set ip_part " + ch.agsl.dynarapid.GenerateDesign.fpga_part + "\n");
+                tclFileWriter.write("set ip_dir " + LocationParser.vhdlSynthDCPs + dcpName + "_ip\n");
+                tclFileWriter.write("file delete -force $ip_dir\n");
+                tclFileWriter.write("source " + ipTcl.getPath() + "\n");
+            }
+
             tclFileWriter.write("read_vhdl -vhdl2008 " + srcVHDLFilesLoc + "arithmetic_units.vhd\n");
             tclFileWriter.write("read_vhdl -vhdl2008 " + srcVHDLFilesLoc + "elastic_components.vhd\n");
             tclFileWriter.write("read_vhdl -vhdl2008 " + srcVHDLFilesLoc + "MemCont.vhd\n");
@@ -108,7 +120,16 @@ public class SynthesisTclGenerator {
 
             //generating the dcp
             tclFileWriter.write("write_checkpoint -force " + LocationParser.vhdlSynthDCPs + dcpName + "_synth.dcp\n");
-            tclFileWriter.write("write_edif -force " + LocationParser.vhdlSynthDCPs + dcpName + "_synth.edf\n");
+            if(ipTcl.exists())
+            {
+                //the IP cores are encrypted: their .edn go in <unit>_edn/ (modules/EncryptedCores)
+                String ednDir = EncryptedCores.synthDirectory(LocationParser.vhdlSynthDCPs + dcpName + "_synth.dcp");
+                tclFileWriter.write("file delete -force " + ednDir + "\n");
+                tclFileWriter.write("write_edif -force -security_mode multifile " + ednDir + "/" + dcpName + "_synth.edf\n");
+                tclFileWriter.write("file rename -force " + ednDir + "/" + dcpName + "_synth.edf " + LocationParser.vhdlSynthDCPs + dcpName + "_synth.edf\n");
+            }
+            else
+                tclFileWriter.write("write_edif -force " + LocationParser.vhdlSynthDCPs + dcpName + "_synth.edf\n");
 
             tclFileWriter.close();
         }

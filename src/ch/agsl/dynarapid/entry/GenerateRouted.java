@@ -15,6 +15,7 @@ import ch.agsl.dynarapid.strings.StringUtils;
 import com.xilinx.rapidwright.design.Design;
 import com.xilinx.rapidwright.design.DesignTools;
 import com.xilinx.rapidwright.edif.EDIFTools;
+import ch.agsl.dynarapid.modules.EncryptedCores;
 import com.xilinx.rapidwright.rwroute.PartialRouter;
 import com.xilinx.rapidwright.rwroute.RWRoute;
 
@@ -56,8 +57,10 @@ public class GenerateRouted {
         design.flattenDesign();
         EDIFTools.uniqueifyNetlist(design);
         boolean softPreserve = true;
+        com.xilinx.rapidwright.edif.EDIFNetlist unrouted = design.getNetlist();
         design = PartialRouter.routeDesignPartialNonTimingDriven(design, null, softPreserve);
-        design.writeCheckpoint(finalLocation);
+        EncryptedCores.add(design.getNetlist(), unrouted);
+        EncryptedCores.writeCheckpoint(design, finalLocation.toString());
         return true;
     }
 
@@ -90,8 +93,10 @@ public class GenerateRouted {
         StringUtils.printIntro("Started full routing using RWRouter");
         design.getNetlist().resetParentNetMap();
         DesignTools.makePhysNetNamesConsistent(design);
+        com.xilinx.rapidwright.edif.EDIFNetlist unrouted = design.getNetlist();
         design = RWRoute.routeDesignFullNonTimingDriven(design);
-        design.writeCheckpoint(finalLocation);
+        EncryptedCores.add(design.getNetlist(), unrouted);
+        EncryptedCores.writeCheckpoint(design, finalLocation.toString());
         return true;
     }
 

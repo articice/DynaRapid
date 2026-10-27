@@ -44,7 +44,7 @@ import java.util.*;
 public class PlacedRoutedLogParser {
     static String checkStrings[] = {
         "source",                                                           //Error: 0
-        "open_checkpoint:",                                                 //ERROR: 1
+        "open_checkpoint:",                                                 //ERROR: 1 (or link_design:, see passes)
         "place_design completed successfully",                              //ERROR: 2                         
         "route_design completed successfully",                              //ERROR: 3
         "       # of nets with routing errors.......... :           0 :",   //ERROR: 4
@@ -72,6 +72,12 @@ public class PlacedRoutedLogParser {
         return errorMsg;
     }
 
+    //A design with encrypted cores is opened with read_checkpoint + link_design (modules/EncryptedCores)
+    static boolean passes(String line, int i)
+    {
+        return line.startsWith(checkStrings[i]) || (i == 1 && line.startsWith("link_design:"));
+    }
+
     public static int logsChecker(String logFileLoc)
     {
         int i = 0;
@@ -81,7 +87,7 @@ public class PlacedRoutedLogParser {
             Scanner in = new Scanner(logFile);
 
             while(in.hasNextLine() && (i < checkStrings.length))
-                if(in.nextLine().startsWith(checkStrings[i]))
+                if(passes(in.nextLine(), i))
                     i++;
         }
 
@@ -104,7 +110,7 @@ public class PlacedRoutedLogParser {
             Scanner in = new Scanner(logFile);
 
             while(in.hasNextLine() && (i < checkStrings.length))
-                if(in.nextLine().startsWith(checkStrings[i]) || omitChecks.contains(i))
+                if(passes(in.nextLine(), i) || omitChecks.contains(i))
                     i++;
         }
 

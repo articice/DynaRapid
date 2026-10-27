@@ -596,6 +596,7 @@ public class Circular implements PinExposer{
         Module module = new Module(Design.readCheckpoint(pblock.component.moduleLoc), pblock.component.metaLoc);
         design.createModuleInst(pblock.pblockName + "_cell", module);
         EDIFCellInst moduleEDIFCellInst = module.getNetlist().getTopCell().createCellInst(pblock.pblockName + "_cell", module.getNetlist().getTopCell());
+        EncryptedCores.add(design.getNetlist(), EncryptedCores.ofSynth(pblock.component.moduleLoc));
 
         designPorts = new ArrayList<>();
         designRouteNets = new ArrayList<>();

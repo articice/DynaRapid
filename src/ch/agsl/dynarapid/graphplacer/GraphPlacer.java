@@ -10,6 +10,7 @@ package ch.agsl.dynarapid.graphplacer;
 import ch.agsl.dynarapid.GenerateDesign;
 import ch.agsl.dynarapid.debug.TimeProfiler;
 import ch.agsl.dynarapid.entry.GenerateRouted;
+import ch.agsl.dynarapid.modules.EncryptedCores;
 import ch.agsl.dynarapid.modules.Node;
 import ch.agsl.dynarapid.modules.Shape;
 import ch.agsl.dynarapid.parser.LocationParser;
@@ -20,6 +21,7 @@ import com.xilinx.rapidwright.design.Module;
 import com.xilinx.rapidwright.edif.EDIFCell;
 import com.xilinx.rapidwright.edif.EDIFDirection;
 import com.xilinx.rapidwright.edif.EDIFNet;
+import com.xilinx.rapidwright.edif.EDIFNetlist;
 import com.xilinx.rapidwright.edif.EDIFPort;
 import com.xilinx.rapidwright.examples.SLRCrosserGenerator;
 
@@ -100,6 +102,9 @@ public class GraphPlacer {
                 return false;
 
             }
+        //encrypted IP cores of the units (modules/EncryptedCores): createModuleInst doesn't carry them
+        for (Module module : moduleMap.values())
+            EncryptedCores.add(design.getNetlist(), module.getNetlist());
 
         if(!TimeProfiler.endTimeElement("Module Loading"))
             return false;
@@ -145,7 +150,7 @@ public class GraphPlacer {
         design.getNetlist().resetParentNetMap();
 
         if(debug)
-            design.writeCheckpoint(LocationParser.designs + graphName + "/" + graphName + "_placed.dcp");
+            EncryptedCores.writeCheckpoint(design, LocationParser.designs + graphName + "/" + graphName + "_placed.dcp");
 
         if(!TimeProfiler.endTimeElement("Module Placement"))
             return false;
@@ -187,8 +192,10 @@ public class GraphPlacer {
         //The temporary workaround solution is to re-read the dcp just written which coonsumes time but since done in debug mode, workaround is appreciable.
         if(debug)
         {
-            design.writeCheckpoint(LocationParser.designs + graphName + "/" + graphName + "_stitched.dcp");
+            EDIFNetlist written = design.getNetlist();
+            EncryptedCores.writeCheckpoint(design, LocationParser.designs + graphName + "/" + graphName + "_stitched.dcp");
             design = Design.readCheckpoint(LocationParser.designs + graphName + "/" + graphName + "_stitched.dcp");
+            EncryptedCores.add(design.getNetlist(), written);
         }
 
         if(!TimeProfiler.endTimeElement("Stitching Peripherals"))

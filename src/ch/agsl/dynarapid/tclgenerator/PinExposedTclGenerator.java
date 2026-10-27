@@ -10,6 +10,7 @@ package ch.agsl.dynarapid.tclgenerator;
 
 import ch.agsl.dynarapid.interrouting.RouteSite;
 import ch.agsl.dynarapid.interrouting.algorithms.PinExposer;
+import ch.agsl.dynarapid.modules.EncryptedCores;
 import ch.agsl.dynarapid.modules.ModulePorts;
 import ch.agsl.dynarapid.parser.LocationParser;
 import ch.agsl.dynarapid.strings.StringUtils;
@@ -42,8 +43,9 @@ public class PinExposedTclGenerator {
             tclFileWriter.write("set general.maxThreads 16\n");
 
             //Opening the design
-            tclFileWriter.write("open_checkpoint " + LocationParser.exposedDCPs + obj.returnPblock().component.dcpName + "/" + obj.returnPblock().pblockName + "_connected.dcp\n");
-            
+            tclFileWriter.write(EncryptedCores.openCheckpoint(LocationParser.exposedDCPs + obj.returnPblock().component.dcpName + "/" + obj.returnPblock().pblockName + "_connected.dcp",
+                                                              obj.returnDesign().getNetlist(), ch.agsl.dynarapid.GenerateDesign.fpga_part));
+
             //Creating clock
             tclFileWriter.write("create_clock -period 2.5 -name clk -waveform {0.000 1.25} [get_ports clk]\n");
             tclFileWriter.write("set_property HD.CLK_SRC BUFGCTRL_X0Y2 [get_ports clk]\n");
@@ -249,7 +251,9 @@ public class PinExposedTclGenerator {
             String prefix = LocationParser.getPlacedRoutedDCPsPath() + File.separator + obj.returnPblock().component.dcpName;
             tclFileWriter.write("report_utilization -pblocks pblock_1 -packthru -file " + prefix + "/" + obj.returnPblock().pblockName + ".util\n");
             tclFileWriter.write("write_checkpoint -force " + prefix + "/" + obj.returnPblock().pblockName + "_placedRouted.dcp\n");
-            tclFileWriter.write("write_edif -force " + prefix + "/" + obj.returnPblock().pblockName + "_placedRouted.edf\n");
+            //a unit with encrypted cores: their .edn next to its EDIF, in the unit's directory (modules/EncryptedCores)
+            tclFileWriter.write("write_edif -force " + EncryptedCores.writeEdifOptions(EncryptedCores.has(obj.returnDesign().getNetlist()))
+                                + prefix + "/" + obj.returnPblock().pblockName + "_placedRouted.edf\n");
             tclFileWriter.write(LocationParser.sourceRW + "\n");
             tclFileWriter.write("generate_metadata " + prefix + "/" + obj.returnPblock().pblockName + "_placedRouted.dcp " + prefix + "/ 0\n");
 
