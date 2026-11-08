@@ -368,7 +368,10 @@ public class Circular implements PinExposer{
 
             //Apparently some buses have width of 0 and RW cannot read these buses without "[0]" added in the end of the bus name
             //This [0] is present in the synthesized designs generated using the vhdl method
-            if(ModulePorts.isBusFromName(busName) && isVHDL && (busWidth == 1))
+            //A 1-bit vector outside the name list above (a memory controller's loadAddr with a 1-bit
+            //address) is also named "<port>[0]": ask the netlist
+            if(isVHDL && (busWidth == 1) && (ModulePorts.isBusFromName(busName)
+                || (moduleEDIFCellInst.getPort(busName) == null && moduleEDIFCellInst.getPort(busName + "[0]") != null)))
                 busName += "[0]";
     
             for(int i = 0; i < busWidth; i++)
@@ -427,7 +430,10 @@ public class Circular implements PinExposer{
                 continue;
 
             //Apparently some buses have width of 0 and RW cannot read these buses without "[0]" added in the end of the bus name
-            if(ModulePorts.isBusFromName(busName) && isVHDL && (busWidth == 1))
+            //A 1-bit vector outside the name list above (a memory controller's loadAddr with a 1-bit
+            //address) is also named "<port>[0]": ask the netlist
+            if(isVHDL && (busWidth == 1) && (ModulePorts.isBusFromName(busName)
+                || (moduleEDIFCellInst.getPort(busName) == null && moduleEDIFCellInst.getPort(busName + "[0]") != null)))
                 busName += "[0]";
 
             for(int i = 0; i < busWidth; i++)
@@ -510,8 +516,8 @@ public class Circular implements PinExposer{
     {
         EDIFCell top = design.getNetlist().getTopCell();
 
-        int inputPins, outputPins;
-        inputPins = outputPins = 0;
+        int dataPins, cePins, outputPins;
+        dataPins = cePins = outputPins = 0;
 
         for(RouteSite r : routeSites)
         {
@@ -522,28 +528,54 @@ public class Circular implements PinExposer{
                     continue;
 
                 if(flop.inputNet == null)
-                    inputPins++;
+                    dataPins++;
 
                 if(flop.outputNet == null)
                     outputPins++;
 
                 if(flop.ceNet == null)
-                    inputPins++;
+                    cePins++;
             }
         }
 
-        EDIFPort inputPort, outputPort;
-        inputPort = outputPort = null;
+        EDIFPort inputPort, dataPort, outputPort;
+        inputPort = dataPort = outputPort = null;
         EDIFNet inputNet = null;
-        int outputIndex = 0;
+        int dataIndex = 0, outputIndex = 0;
 
-        if(inputPins > 0)
+        // The flops' clock enables share one input. Their D inputs do not: each gets a bit of its own.
+        // With one shared D every exposure flop is the same signal to Vivado, so logic computing the
+        // same function of different module ports looks equivalent, and place_design's equivalent
+        // driver rewiring moves loads between those copies; once the flops are removed the module no
+        // longer matches its RTL (netecho's 17-store memory controller, 2026-11-07;
+        // test/integration/exposure_harness).
+        // Tests only: the old harness, one shared input for the D pins as well (proves that
+        // test/integration/exposure_synthetic still catches the rewiring)
+        boolean sharedData = Boolean.getBoolean("dynarapid.test.sharedExposureInputs");
+        if(sharedData)
+        {
+            cePins += dataPins;
+            dataPins = 0;
+        }
+
+        if(cePins > 0)
         {
             inputPort = top.createPort("inputPort", EDIFDirection.INPUT, 1);
             inputNet = top.createNet("inputNet");
             inputNet.createPortInst(inputPort);
             designRouteNets.add(inputNet);
             designPorts.add(inputPort);
+        }
+
+        if(dataPins > 0)
+        {
+            if(dataPins == 1)
+                dataPort = top.createPort("dataPort", EDIFDirection.INPUT, dataPins);
+
+            else
+                dataPort = top.createPort("dataPort[" + (dataPins-1) + ":0]", EDIFDirection.INPUT, dataPins);
+
+            designPorts.add(dataPort);
         }
 
         if(outputPins > 0)
@@ -565,8 +597,20 @@ public class Circular implements PinExposer{
                 if(flop == null)
                     continue;
 
-                if(flop.inputNet == null)
+                if(flop.inputNet == null && sharedData)
                     flop.connectToFlopInput(inputNet);
+
+                else if(flop.inputNet == null)
+                {
+                    EDIFNet dataNet = top.createNet("dataNet_" + dataIndex);
+                    if(dataPort.isBus())
+                        dataNet.createPortInst(dataPort, dataIndex);
+                    else
+                        dataNet.createPortInst(dataPort);
+                    flop.connectToFlopInput(dataNet);
+                    designRouteNets.add(dataNet);
+                    dataIndex++;
+                }
 
                 if(flop.ceNet == null)
                     flop.connectToFlopCE(inputNet);
