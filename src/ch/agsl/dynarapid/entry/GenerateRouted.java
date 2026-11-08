@@ -100,6 +100,62 @@ public class GenerateRouted {
         return true;
     }
 
+    /*
+     * A design with LSQs assembled from sub-units (lsq/LsqAssembler): after flattening, the group
+     * allocators' tables get the kernel's INITs; then all unrouted signal pins (the LSQs' nets
+     * between sub-units and to the kernel, and the kernel's stitched nets) are routed together,
+     * timing-driven (-Ddynarapid.lsqTiming=false: not), and what's left (static nets) after them.
+     * Together, because RWRoute reserves only the sinks of the nets it routes: an LSQ net routed
+     * alone bounced through a kernel buffer's input pin (INT BOUNCE node) and the next pass failed.
+     */
+    public static boolean routeDesignWithLsqs(Design design, Path finalLocation)
+    {
+        StringUtils.printIntro("Routing a design with LSQs: signal nets first");
+        java.util.Set<String> lsqSites = ch.agsl.dynarapid.lsq.LsqAssembler.siteNames();
+        String netlistDump = System.getProperty("dynarapid.lsqNetlistDump");
+        if (netlistDump != null)
+            design.getNetlist().exportEDIF(netlistDump);
+        design.getNetlist().resetParentNetMap();
+        design.flattenDesign();
+        EDIFTools.uniqueifyNetlist(design);
+        ch.agsl.dynarapid.lsq.LsqAssembler.patchTables(design);
+        DesignTools.makePhysNetNamesConsistent(design);
+        String dump = System.getProperty("dynarapid.lsqDump");
+        if (dump != null)
+        {
+            design.writeCheckpoint(dump);
+            System.out.println("LSQ: pre-route checkpoint " + dump);
+        }
+        com.xilinx.rapidwright.edif.EDIFNetlist unrouted = design.getNetlist();
+        //placed modules don't mark their pins routed (PartialRouter would rip up their routes), and
+        //stitched nets have no site pins yet
+        DesignTools.createMissingSitePinInsts(design);
+        DesignTools.updatePinsIsRouted(design);
+
+        java.util.List<com.xilinx.rapidwright.design.SitePinInst> pins = new java.util.ArrayList<>();
+        int lsqPins = 0;
+        for (com.xilinx.rapidwright.design.SitePinInst p : PartialRouter.getUnroutedPins(design))
+        {
+            com.xilinx.rapidwright.design.Net n = p.getNet();
+            if (n == null || n.isClockNet() || n.isStaticNet())
+                continue;
+            pins.add(p);
+            for (com.xilinx.rapidwright.design.SitePinInst q : n.getPins())
+                if (lsqSites.contains(q.getSiteInst().getSiteName())) { lsqPins++; break; }
+        }
+        System.out.println("Signal nets: " + pins.size() + " unrouted pins (" + lsqPins + " on LSQ nets), routed first");
+        boolean timing = !"false".equals(System.getProperty("dynarapid.lsqTiming"));
+        design = timing ? PartialRouter.routeDesignPartialTimingDriven(design, pins, false)
+                        : PartialRouter.routeDesignPartialNonTimingDriven(design, pins, false);
+        design = PartialRouter.routeDesignPartialNonTimingDriven(design, null, false);
+        DesignTools.updatePinsIsRouted(design);
+        int left = PartialRouter.getUnroutedPins(design).size();
+        System.out.println("Unrouted pins left: " + left);
+        EncryptedCores.add(design.getNetlist(), unrouted);
+        EncryptedCores.writeCheckpoint(design, finalLocation.toString());
+        return true;
+    }
+
     public static void main(String args[])
     {
         if((StringUtils.findInArray("-f", args) ==  -1))

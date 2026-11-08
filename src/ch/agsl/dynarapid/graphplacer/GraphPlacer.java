@@ -7,6 +7,7 @@
 */
 package ch.agsl.dynarapid.graphplacer;
 
+import ch.agsl.dynarapid.lsq.LsqAssembler;
 import ch.agsl.dynarapid.GenerateDesign;
 import ch.agsl.dynarapid.debug.TimeProfiler;
 import ch.agsl.dynarapid.entry.GenerateRouted;
@@ -49,8 +50,27 @@ public class GraphPlacer {
         Design design = new Design(graphName, GenerateDesign.fpga_part);
         EDIFCell top = design.getNetlist().getTopCell();
 
+        //What gets placed: every unit, with each LSQ as its sub-units (lsq/LsqAssembler)
+        Map<String, Node> units = new java.util.LinkedHashMap<>();
+        for (Map.Entry<String,Node> entry : nodes.entrySet())
+            if(!entry.getValue().lsq)
+                units.put(entry.getKey(), entry.getValue());
+            else
+                entry.getValue().design = design;
+        try
+        {
+            for (Node n : LsqAssembler.expand())
+                units.put(n.name, n);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            System.out.println("ERROR: Could not place the LSQ sub-units: " + e.getMessage());
+            return false;
+        }
+
         HashSet<Shape> shapes = new HashSet<>();
-        for (Map.Entry<String,Node> entry : nodes.entrySet()) 
+        for (Map.Entry<String,Node> entry : units.entrySet()) 
         {
             Node node = entry.getValue();
             if(!shapes.contains(node.shape))
@@ -69,7 +89,11 @@ public class GraphPlacer {
                 {
                     System.out.println("Trying to create module for shape: " + sh.pblockName);
 
-                    Module module = sh.createModule();
+                    //submit() keeps a task's exception in its Future: print it, the node then
+                    //loads its module when it's placed (Shape.createModule(Design))
+                    Module module = null;
+                    try { module = sh.createModule(); }
+                    catch (Throwable t) { System.out.println("WARNING: loading " + sh.pblockName + " failed (" + t + "), loading it again when placed"); }
                     if (module == null) 
                         System.err.println("ERROR: Could not load module: " + sh.pblockName);
                     else 
@@ -136,7 +160,7 @@ public class GraphPlacer {
 
         //place all the nodes
         StringUtils.printIntro("Placing graph: " + graphName);
-        for (Map.Entry<String,Node> entry : nodes.entrySet()) 
+        for (Map.Entry<String,Node> entry : units.entrySet()) 
         {
             Node node = entry.getValue();
             if(!node.placeNode(design, clkNet, rstNet))
@@ -164,6 +188,8 @@ public class GraphPlacer {
         StringUtils.printIntro("Checking connections for bitwidth mismatch");
         for (Map.Entry<String,Node> entry : nodes.entrySet()) 
         {
+            if(entry.getValue().lsq)
+                continue;
             try
             {
                 entry.getValue().updateConnectionsForBitwidthMismatch();
@@ -180,7 +206,10 @@ public class GraphPlacer {
         //stitch all the node peripherals
         StringUtils.printIntro("Started Stitching Graph");
         for (Map.Entry<String,Node> entry : nodes.entrySet()) 
-            entry.getValue().stitchPeripherals();
+            if(entry.getValue().lsq)
+                LsqAssembler.of(entry.getValue()).stitch();
+            else
+                entry.getValue().stitchPeripherals();
         
         //Adding extras
         design.getNetlist().resetParentNetMap();
@@ -208,6 +237,8 @@ public class GraphPlacer {
         
         //Starting the routing of the design
         Path dcpFile = GenerateDesign.getDefaultOutputDCPPath(graphName);
+        if(LsqAssembler.any())
+            return GenerateRouted.routeDesignWithLsqs(design, dcpFile);
         if(!complete)
             return GenerateRouted.routeDesignPartially(design, dcpFile);
 

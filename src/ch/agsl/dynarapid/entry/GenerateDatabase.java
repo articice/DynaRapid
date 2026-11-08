@@ -17,6 +17,7 @@ import ch.agsl.dynarapid.strings.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class GenerateDatabase {
@@ -24,10 +25,13 @@ public class GenerateDatabase {
     public static ArrayList<String> getAllModuleNames() {
         ArrayList<String> moduleNames = new ArrayList<>();
         File dir = LocationParser.getPlacedRoutedDCPsPath().toFile();
-        File [] files = dir.listFiles();
+        ArrayList<File> files = new ArrayList<>(Arrays.asList(dir.listFiles()));
+        File subunits = new File(dir, LocationParser.SUBUNIT_FOLDER);
+        if (subunits.isDirectory())
+            files.addAll(Arrays.asList(subunits.listFiles()));
 
         for (File file : files) {
-            if (!file.isDirectory() || (file.listFiles().length == 0)) {
+            if (!file.isDirectory() || (file.listFiles().length == 0) || file.equals(subunits)) {
                 continue;
             }
 
@@ -136,7 +140,7 @@ public class GenerateDatabase {
         //This will take all the existing databases and generate the binary databases only
         StringUtils.printIntro("Generating binary databses for specified modules");
         for (String s : moduleNames) {
-            String dataLoc = LocationParser.getPlacedRoutedDCPsPath().resolve(s + ".data").toString();
+            String dataLoc = LocationParser.libraryPath(s + ".data").toString();
             File file = new File(dataLoc);
 
             //This means the database corresponding to this module name has not been generated yet.

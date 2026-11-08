@@ -97,7 +97,7 @@ public class SynthesisTclGenerator {
 
             //Xilinx IP cores of the variant (scripts/xilinx_ip.py): <variant>.ip.tcl creates them with
             //create_ip for $ip_part, in the in-memory project, to be synthesized with the variant
-            File ipTcl = new File(vhdlFiles + dcpName + ".ip.tcl");
+            File ipTcl = new File(LocationParser.vhdlPath(dcpName + ".ip.tcl"));
             if(ipTcl.exists())
             {
                 tclFileWriter.write("create_project -in_memory -part " + ch.agsl.dynarapid.GenerateDesign.fpga_part + "\n");
@@ -113,7 +113,7 @@ public class SynthesisTclGenerator {
             tclFileWriter.write("read_vhdl -vhdl2008 " + srcVHDLFilesLoc + "delay_buffer.vhd\n");
             tclFileWriter.write("read_vhdl -vhdl2008 " + srcVHDLFilesLoc + "mul_wrapper.vhd\n");
             tclFileWriter.write("read_vhdl -vhdl2008 " + srcVHDLFilesLoc + "multipliers.vhd\n");
-            tclFileWriter.write("read_vhdl -vhdl2008 " + vhdlFiles + dcpName + ".vhd\n");
+            tclFileWriter.write("read_vhdl -vhdl2008 " + LocationParser.vhdlPath(dcpName + ".vhd") + "\n");
 
             //Getting the syntesis line
             tclFileWriter.write(nodeTclLine + "\n");

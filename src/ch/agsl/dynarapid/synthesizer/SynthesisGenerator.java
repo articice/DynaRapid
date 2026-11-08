@@ -336,7 +336,7 @@ public class SynthesisGenerator {
 
     public static boolean checkIfVHDLPresent(String dcpName)
     {
-        File file = new File(LocationParser.vhdlFiles + dcpName + ".vhd");
+        File file = new File(LocationParser.vhdlPath(dcpName + ".vhd"));
         return file.exists();
     }
     

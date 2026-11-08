@@ -100,7 +100,7 @@ public class PblockDatabase {
     public static boolean printDatabase(FileWriter dataWriter, String pblockName, String dcpName, int si, int sj,
             int ei, int ej) throws Exception {
         System.out.println("\nWriting database for pblock: " + pblockName);
-        File file = LocationParser.getPlacedRoutedDCPsPath().resolve(dcpName)
+        File file = LocationParser.libraryPath(dcpName)
                 .resolve(pblockName + "_placedRouted.dcp").toFile();
         if (!file.exists()) {
             System.out.println("ERROR: Could not trace dcp: " + pblockName);
@@ -113,7 +113,7 @@ public class PblockDatabase {
 		EDIFNetlist netlist = design.getNetlist();
 
         String dcp = file.getAbsolutePath();
-        String meta = LocationParser.getPlacedRoutedDCPsPath().resolve(dcpName)
+        String meta = LocationParser.libraryPath(dcpName)
                 .resolve(pblockName + "_placedRouted_0_metadata.txt").toString();
 
         Module m = new Module(Design.readCheckpoint(dcp), meta);

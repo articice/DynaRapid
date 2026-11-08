@@ -96,6 +96,8 @@ public class Node implements Serializable
     public ArrayList<Output> outputs = new ArrayList<>();
 
     public String dcpName;
+    //An LSQ (handshake.lsq): assembled from library sub-units (lsq/), not looked up as a unit
+    public boolean lsq = false;
     public Component component;
 
     //For the graph-placer

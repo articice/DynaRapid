@@ -87,12 +87,15 @@ public class HwMlirParser {
     public static String kernelName;
     //kernel port -> top-level design ports of the DynaRapid design
     public static Map<String, List<String>> portMap = new LinkedHashMap<>();
+    //LSQ node -> its extern module: LSQs are assembled from sub-units (warp docs/plans/lsq-subunits.md)
+    public static Map<String, ExternModule> lsqs = new LinkedHashMap<>();
 
     public static Map<String, Node> parser(String mlirLoc) {
         StringUtils.printIntro("Parsing " + mlirLoc);
         Input.exactBitwidths = true;
         externs.clear();
         portMap.clear();
+        lsqs.clear();
 
         try {
             List<String> lines = Files.readAllLines(Paths.get(mlirLoc));
@@ -256,6 +259,9 @@ public class HwMlirParser {
 
             String description = inst.name + " @" + m.symbol + " (" + m.unitName + " {" + m.parameters + "})";
             Node node = new Node(inst.name, m.unitName, m.variantName, inWidths, outWidths, description);
+            node.lsq = m.unitName.equals("handshake.lsq");
+            if (node.lsq)
+                lsqs.put(inst.name, m);
             inst.node = node;
             nodes.put(inst.name, node);
 
@@ -470,10 +476,12 @@ public class HwMlirParser {
         mapPort(kernelPort, node + "_" + ready + index);
     }
 
+    //Library units the kernel needs (LSQs aren't units: they're built from sub-units)
     static List<String> variantNames(Map<String, Node> nodes) {
         List<String> names = new ArrayList<>();
         for (Node n : nodes.values())
-            names.add(n.dcpName);
+            if (!n.lsq)
+                names.add(n.dcpName);
         return names;
     }
 
@@ -571,7 +579,9 @@ public class HwMlirParser {
     /*
      * Writes <out>_variants.tsv (one line per library variant: name, count, extern symbol,
      * hw.name, parameters, ports), <out>_externs.tsv (every extern module used -> its variant)
-     * and <out>_ports.tsv (kernel port -> design ports).
+     * <out>_ports.tsv (kernel port -> design ports) and <out>_lsqs.tsv (each LSQ node: its extern,
+     * whose <extern>.json in the RTL export is the generator's configuration, and its ports with
+     * the node's channel index, -1 for plain signals).
      */
     public static void writeTables(Map<String, Node> nodes, String outPrefix) throws IOException {
         Map<String, Integer> counts = new TreeMap<>();
@@ -598,6 +608,22 @@ public class HwMlirParser {
             for (ExternModule m : externs.values())
                 if (counts.containsKey(m.variantName))
                     w.println(m.symbol + "\t" + m.variantName);
+        }
+
+        try (PrintWriter w = new PrintWriter(outPrefix + "_lsqs.tsv")) {
+            w.println("# node\textern\tports");
+            for (Map.Entry<String, ExternModule> e : lsqs.entrySet()) {
+                StringBuilder ports = new StringBuilder();
+                int in = 0, out = 0;
+                for (Port p : e.getValue().ports) {
+                    if (p.isClockOrReset())
+                        continue;
+                    int index = p.channelWidth() < 0 ? -1 : (p.isInput ? in++ : out++);
+                    ports.append(ports.length() == 0 ? "" : ", ").append(p.isInput ? "in " : "out ").append(p.name)
+                         .append(" ").append(index).append(" : ").append(p.type);
+                }
+                w.println(e.getKey() + "\t" + e.getValue().symbol + "\t" + ports);
+            }
         }
 
         try (PrintWriter w = new PrintWriter(outPrefix + "_ports.tsv")) {

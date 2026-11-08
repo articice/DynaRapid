@@ -46,8 +46,9 @@ public class PinExposedTclGenerator {
             tclFileWriter.write(EncryptedCores.openCheckpoint(LocationParser.exposedDCPs + obj.returnPblock().component.dcpName + "/" + obj.returnPblock().pblockName + "_connected.dcp",
                                                               obj.returnDesign().getNetlist(), ch.agsl.dynarapid.GenerateDesign.fpga_part));
 
-            //Creating clock
-            tclFileWriter.write("create_clock -period 2.5 -name clk -waveform {0.000 1.25} [get_ports clk]\n");
+            //Creating clock (tests may tighten it to put a small unit under timing pressure)
+            double period = Double.parseDouble(System.getProperty("dynarapid.test.exposureClockPeriod", "2.5"));
+            tclFileWriter.write("create_clock -period " + period + " -name clk -waveform {0.000 " + (period / 2) + "} [get_ports clk]\n");
             tclFileWriter.write("set_property HD.CLK_SRC BUFGCTRL_X0Y2 [get_ports clk]\n");
 
             //Fixing the flops and LUTs
@@ -77,8 +78,12 @@ public class PinExposedTclGenerator {
             tclFileWriter.write("add_cells_to_pblock pblock_1 [get_cells [list " + obj.returnPblock().pblockName + "_cell" + "]] -clear_locs\n"); //Assigning the pblock_1 for the given module
             tclFileWriter.write("set_property CONTAIN_ROUTING 1 [get_pblocks pblock_1]\n");
 
-            //Place design
-            tclFileWriter.write("place_design\n");
+            //Place design. LSQ sub-units without physical synthesis: in this design the module's ports
+            //are looped through the exposure flops, and PSIP's equivalent driver rewiring moved an LSQ
+            //core's loads onto those flops, which the post-route script then removes (547 cells lost,
+            //no longer its RTL). Units with handshake ports only are built as before.
+            boolean subunit = LocationParser.isSubunit(obj.returnPblock().component.dcpName);
+            tclFileWriter.write(subunit ? "place_design -no_psip\n" : "place_design\n");
 
             //creating the pblock_2
             tclFileWriter.write("create_pblock pblock_2\n");
@@ -244,11 +249,11 @@ public class PinExposedTclGenerator {
             tclFileWriter.write("report_route_status\n");
 
             //Export files
-            File f = LocationParser.getPlacedRoutedDCPsPath().resolve(obj.returnPblock().component.dcpName).toFile();
+            File f = LocationParser.libraryPath(obj.returnPblock().component.dcpName).toFile();
             if(!f.exists())
                 f.mkdirs();
 
-            String prefix = LocationParser.getPlacedRoutedDCPsPath() + File.separator + obj.returnPblock().component.dcpName;
+            String prefix = LocationParser.libraryPath(obj.returnPblock().component.dcpName).toString();
             tclFileWriter.write("report_utilization -pblocks pblock_1 -packthru -file " + prefix + "/" + obj.returnPblock().pblockName + ".util\n");
             tclFileWriter.write("write_checkpoint -force " + prefix + "/" + obj.returnPblock().pblockName + "_placedRouted.dcp\n");
             //a unit with encrypted cores: their .edn next to its EDIF, in the unit's directory (modules/EncryptedCores)

@@ -180,7 +180,7 @@ public class Pblock implements Serializable
         fileLocs.add(LocationParser.exposedDCPs + component.dcpName + "/" + pblockName + "_postRoute.tcl");
         fileLocs.add(LocationParser.exposedDCPs + component.dcpName + "/" + pblockName + ".report");
 
-        Path dcpPath = LocationParser.getPlacedRoutedDCPsPath().resolve(component.dcpName);
+        Path dcpPath = LocationParser.libraryPath(component.dcpName);
         fileLocs.add(dcpPath.resolve(pblockName + "_placedRouted.dcp").toString());
         fileLocs.add(dcpPath.resolve(pblockName + "_placedRouted.edf").toString());
         fileLocs.add(dcpPath.resolve(pblockName + "_placedRouted_0_metadata.txt").toString());
@@ -221,7 +221,7 @@ public class Pblock implements Serializable
         Design design = new Design("test", GenerateDesign.fpga_part);
 		EDIFNetlist netlist = design.getNetlist();
 
-        Path dcpPath = LocationParser.getPlacedRoutedDCPsPath().resolve(component.dcpName);
+        Path dcpPath = LocationParser.libraryPath(component.dcpName);
         Path dcp = dcpPath.resolve(pblockName + "_placedRouted.dcp");
         String meta = dcpPath.resolve(pblockName + "_placedRouted_0_metadata.txt").toString();
 
@@ -314,7 +314,7 @@ public class Pblock implements Serializable
             System.out.println("Pblock: " + pblockName + " placed and routed successfully. Going on to repairing the pblock");
             
             tclLoc = LocationParser.exposedDCPs + component.dcpName + "/" + pblockName + "_postRoute.tcl";
-            logsLoc = LocationParser.getPlacedRoutedDCPsPath().resolve(component.dcpName)
+            logsLoc = LocationParser.libraryPath(component.dcpName)
                     .resolve(pblockName + ".report").toString();
             errorReference = "post-exposed: " + pblockName;
             errorCode = 1;

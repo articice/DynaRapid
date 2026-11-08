@@ -295,7 +295,10 @@ public class GenerateDesign {
             isCenterSpecified = true;
             String center = args[StringUtils.findInArray("-center", args) + 1];
             if(center.contains("SLICE"))
+            {
                 centerSiteName = center;
+                ch.agsl.dynarapid.lsq.LsqAssembler.centerSiteName = center;
+            }
 
             else if(center.contains("R") && center.contains("_C") && center.contains("_Side"))
             {
@@ -338,6 +341,7 @@ public class GenerateDesign {
 
         if(constrain)
             getConstrainValues(constrainCoordinates);
+        ch.agsl.dynarapid.lsq.LsqAssembler.window = constrainCoordinates.clone();
 
         if(!TimeProfiler.endTimeElement("Constraining FPGA"))
         {

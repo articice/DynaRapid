@@ -58,8 +58,8 @@ public class GraphGenerator {
         HashSet<String> notFound = new HashSet<>();
 
         for (String s : dcpNames) {
-            File dataFile = LocationParser.getPlacedRoutedDCPsPath().resolve(s + ".data").toFile();
-            File binFile = LocationParser.getPlacedRoutedDCPsPath().resolve(s + ".bin.data").toFile();
+            File dataFile = LocationParser.libraryPath(s + ".data").toFile();
+            File binFile = LocationParser.libraryPath(s + ".bin.data").toFile();
 
             if (!dataFile.exists() && !binFile.exists())
                 notFound.add(s);
@@ -76,6 +76,8 @@ public class GraphGenerator {
             Node node = entry.getValue();
             String dcpName = node.dcpName;
 
+            if (node.lsq) //assembled from sub-units (lsq/LsqAssembler), not a library unit
+                continue;
             if (!dcpNames.contains(dcpName))
                 dcpNames.add(dcpName);
         }
@@ -239,7 +241,14 @@ public class GraphGenerator {
             Node node = entry.getValue();
             String dcpName = node.dcpName;
 
-            node.updateComponent(components.get(dcpName));
+            if (node.lsq) {
+                Component lsq = ch.agsl.dynarapid.lsq.LsqAssembler.floorplan(node, device);
+                if (lsq == null)
+                    return null;
+                node.updateComponent(lsq);
+            }
+            else
+                node.updateComponent(components.get(dcpName));
         }
 
         StringUtils.printIntro("Completed parsing all the required databases.");

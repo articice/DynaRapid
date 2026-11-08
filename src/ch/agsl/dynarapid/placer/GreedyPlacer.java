@@ -265,6 +265,10 @@ public class GreedyPlacer implements Placer {
             @Override
             public int compare(Pair p1, Pair p2)
             {
+                //LSQs first: they are the largest units, and the kernel goes around them
+                boolean l1 = nodes.get(p1.getValue()).lsq, l2 = nodes.get(p2.getValue()).lsq;
+                if (l1 != l2)
+                    return l1 ? -1 : 1;
                 return p2.getKey()- p1.getKey();
             }
         });
@@ -517,6 +521,11 @@ public class GreedyPlacer implements Placer {
         while(!nodeQ.isEmpty())
         {
             Node node = nodeQ.peek();
+            if(node.hasPlacementData()) //an LSQ, placed by placeLsqs
+            {
+                nodeQ.remove();
+                continue;
+            }
             node.updatePadding(pad, pad, pad, pad); //This updates the padding of the node to uniform padding
             System.out.print("Calculating preferred center location of node: " + node.name);
             int centerLoc[] = getPreferredCenterCoordinates(node); 
@@ -557,6 +566,153 @@ public class GreedyPlacer implements Placer {
         return true;
     }
 
+    /*
+     * The LSQs (assembled from sub-units, lsq/LsqAssembler), all before the kernel, as one vertical
+     * stack: a wide core's column pattern matches at one place only, so an assembled LSQ moves up and
+     * down but not sideways, and several LSQs of a kernel share a column. Placed one by one, the
+     * first took the middle and the kernel filled the column around it (netecho: no room for the
+     * second). Every order of the LSQs is tried at every start row of the window; each LSQ takes the
+     * first valid anchor at or below the previous one's end (GAP apart), and the stack whose middle
+     * is nearest the design center wins.
+     */
+    boolean placeLsqs(Map<String, Node> nodes)
+    {
+        List<Node> lsqs = new ArrayList<>();
+        for(Node n : nodes.values())
+            if(n.lsq)
+                lsqs.add(n);
+        if(lsqs.isEmpty())
+            return true;
+        lsqs.sort(Comparator.comparingInt((Node n) -> -n.component.shapeList.get(0).currRow).thenComparing(n -> n.name));
+
+        //each LSQ's anchors inside the window, by row
+        Map<Node, TreeMap<Integer, List<Integer>>> anchors = new HashMap<>();
+        for(Node n : lsqs)
+        {
+            Shape sh = n.component.shapeList.get(0);
+            TreeMap<Integer, List<Integer>> rows = new TreeMap<>();
+            for(String l : sh.validTopLeftAnchorLocations)
+            {
+                int u = l.indexOf('_');
+                int i = Integer.parseInt(l.substring(1, u)), j = Integer.parseInt(l.substring(u + 2));
+                if(i >= topRow && i + sh.currRow - 1 <= bottomRow && j >= leftCol && j + sh.currCol - 1 <= rightCol)
+                    rows.computeIfAbsent(i, k -> new ArrayList<>()).add(j);
+            }
+            if(rows.isEmpty())
+            {
+                System.out.println("ERROR: LSQ " + n.name + " (" + sh.currRow + " x " + sh.currCol + ") has no valid place inside the window");
+                return false;
+            }
+            anchors.put(n, rows);
+        }
+
+        int gap = ch.agsl.dynarapid.lsq.LsqAssembler.GAP;
+        int[][] best = null;
+        List<Node> bestOrder = null;
+        int bestScore = Integer.MAX_VALUE;
+        for(List<Node> order : orders(lsqs))
+            for(int start = topRow; start <= bottomRow; start++)
+            {
+                int[][] at = new int[order.size()][];
+                int cur = start, first = -1, last = -1;
+                boolean ok = true;
+                for(int k = 0; k < order.size() && ok; k++)
+                {
+                    Shape sh = order.get(k).component.shapeList.get(0);
+                    Map.Entry<Integer, List<Integer>> e = anchors.get(order.get(k)).ceilingEntry(cur);
+                    if(e == null) { ok = false; break; }
+                    int j = e.getValue().get(0);
+                    for(int c : e.getValue()) //nearest the design center's column
+                        if(Math.abs(c + sh.currCol / 2 - centerj) < Math.abs(j + sh.currCol / 2 - centerj))
+                            j = c;
+                    at[k] = new int[] {e.getKey(), j};
+                    if(first < 0)
+                        first = e.getKey();
+                    last = e.getKey() + sh.currRow - 1;
+                    cur = last + 1 + gap;
+                }
+                if(!ok)
+                    break; //later starts only lose anchors
+                int score = Math.abs((first + last) / 2 - centeri);
+                if(score < bestScore)
+                {
+                    bestScore = score;
+                    best = at;
+                    bestOrder = order;
+                }
+            }
+        if(best == null)
+        {
+            System.out.println("ERROR: the LSQs " + lsqs.stream().map(n -> n.name).toList() + " don't fit the window as one stack");
+            for(Node n : lsqs)
+                System.out.println("  " + n.name + " " + n.component.shapeList.get(0).currRow + " rows, anchors in the window at rows "
+                    + rowRuns(anchors.get(n).keySet()));
+            return false;
+        }
+        for(int k = 0; k < bestOrder.size(); k++)
+        {
+            Node n = bestOrder.get(k);
+            n.updatePadding(pad, pad, pad, pad);
+            String loc = "R" + best[k][0] + "_C" + best[k][1];
+            if(!n.canPlace(fabric, topRow, bottomRow, leftCol, rightCol, n.component.shapeList.get(0), loc)
+                || !n.updatePlacementData(fabric, n.component.shapeList.get(0), loc))
+            {
+                System.out.println("ERROR: Could not place LSQ " + n.name + " at " + loc);
+                return false;
+            }
+            System.out.println(n.name + " is placed at top-left anchor location of: " + n.topLeftAnchorLoc + " at RW anchor site: " + n.rwAnchorSiteName + " (LSQ stack)");
+        }
+        return true;
+    }
+
+    //"623-640, 700-789": runs of consecutive rows
+    static String rowRuns(Set<Integer> rows)
+    {
+        StringBuilder b = new StringBuilder();
+        int a = -2, p = -2;
+        for(int r : new TreeSet<>(rows))
+        {
+            if(r != p + 1)
+            {
+                if(a >= 0)
+                    b.append(a == p ? "" + a : a + "-" + p).append(", ");
+                a = r;
+            }
+            p = r;
+        }
+        if(a >= 0)
+            b.append(a == p ? "" + a : a + "-" + p);
+        return b.toString();
+    }
+
+    //Every order of a few LSQs; beyond 5, largest first only
+    static List<List<Node>> orders(List<Node> l)
+    {
+        List<List<Node>> out = new ArrayList<>();
+        if(l.size() > 5)
+        {
+            out.add(l);
+            return out;
+        }
+        permute(new ArrayList<>(l), 0, out);
+        return out;
+    }
+
+    static void permute(List<Node> l, int k, List<List<Node>> out)
+    {
+        if(k == l.size())
+        {
+            out.add(new ArrayList<>(l));
+            return;
+        }
+        for(int i = k; i < l.size(); i++)
+        {
+            Collections.swap(l, k, i);
+            permute(l, k + 1, out);
+            Collections.swap(l, k, i);
+        }
+    }
+
     public Map<String, Node> placer(Map<String, Node> nodes)
     {
         if((centeri < topRow) || (centeri > bottomRow) || (centerj < leftCol) || (centerj > rightCol))
@@ -570,6 +726,9 @@ public class GreedyPlacer implements Placer {
             System.out.println("ERROR: Could not populate the queue. See above logs");
             return null;
         }
+
+        if(!placeLsqs(nodes))
+            return null;
 
         if(!placeAllNodes(nodes))
         {

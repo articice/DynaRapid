@@ -80,8 +80,9 @@ public class PblockGenerator
     public static final int LARGE_UNIT_SITES = 200;
     public static final double LARGE_UNIT_UTILIZATION = 0.75;
     public static final double GROWTH = 0.1;
-    //Most map columns per row for a large unit's pblock (about 2:1 wide in sites)
-    public static final int MAX_ASPECT = 1;
+    //Most map columns per row for a large unit's pblock (about 3:1 wide in sites). 1 was too tight for
+    //LSQs above about 1100 sites in the 29-row library window; 5:1 strips time out in routing
+    public static final double MAX_ASPECT = 1.5;
     //component.dcp with the logic sites scaled to the target utilization
     public ResourceElement need;
 

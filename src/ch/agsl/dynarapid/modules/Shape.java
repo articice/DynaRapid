@@ -145,12 +145,13 @@ public class Shape implements Serializable
 
         design = des;
 
-        Path dcpPath = LocationParser.getPlacedRoutedDCPsPath().resolve(component.dcpName);
+        Path dcpPath = LocationParser.libraryPath(component.dcpName);
         Path dcpLoc = dcpPath.resolve(pblockName + "_placedRouted.dcp");
         String metaLoc = dcpPath.resolve(pblockName + "_placedRouted_0_metadata.txt").toString();
 
         module = new Module(Design.readCheckpoint(dcpLoc), metaLoc);
         design.getNetlist().migrateCellAndSubCells(module.getNetlist().getTopCell(), true);
+        EncryptedCores.add(design.getNetlist(), module.getNetlist());
         System.out.println("Created module for " + pblockName);
 
         //Setting all the module ports of the component
@@ -169,7 +170,7 @@ public class Shape implements Serializable
             return module;
         }
 
-        Path dcpPath = LocationParser.getPlacedRoutedDCPsPath().resolve(component.dcpName);
+        Path dcpPath = LocationParser.libraryPath(component.dcpName);
         Path dcpLoc = dcpPath.resolve(pblockName + "_placedRouted.dcp");
         String metaLoc = dcpPath.resolve(pblockName + "_placedRouted_0_metadata.txt").toString();
 
@@ -230,7 +231,7 @@ public class Shape implements Serializable
         if(resourceUtilization != null)
             return resourceUtilization;
 
-        String utilLoc = LocationParser.getPlacedRoutedDCPsPath().resolve(component.dcpName)
+        String utilLoc = LocationParser.libraryPath(component.dcpName)
                 .resolve(pblockName + ".util").toString();
         PblockUtilizationParser obj = new PblockUtilizationParser(utilLoc);
         if(!obj.status)

@@ -31,6 +31,11 @@ LIBDIR=$ROOT/library/placedRoutedDCPs/$PART-0.1.1
 mkdir -p "$BUILD/state" "$BUILD/logs"
 cp "$VARIANTS" "$BUILD/variants.txt"
 
+# Sub-units (the pieces an LSQ is assembled from: lsq_core_, lsq_ga_, lsq_ptq_, lsq_qtp_) live in
+# lsq/ of the library and of vhdlFiles; their VHDL is written on demand by lsq_subunits.py
+is_subunit() { [[ $1 =~ ^lsq_(core|ptq|qtp|ga)_ ]]; }
+libdir() { if is_subunit "$1"; then echo "$LIBDIR/lsq"; else echo "$LIBDIR"; fi; }
+
 log() { echo "$(date '+%F %T') $*" | tee -a "$BUILD/build.log"; }
 
 java_run() { # <worker dir> <logfile> <class> <args...>
@@ -66,7 +71,7 @@ claim_next() { # <pass>
 cleanup_component() { # <name> <worker dir>
     local name=$1 wdir=$2
     rm -rf "$ROOT/exposedDCPs/$PART/$name" "$ROOT/library/pre-exposedDCPs/$PART/$name"
-    rm -f "$LIBDIR/$name"/*.report
+    rm -f "$(libdir "$name")/$name"/*.report
     # Vivado scratch in the worker directory (.Xil, hd_visual, journals)
     find "$wdir" -mindepth 1 -delete 2>/dev/null
 }
@@ -78,6 +83,12 @@ build_component() { # <worker id> <pass> <name>
     : > "$logf"
     local t0=$(date +%s)
 
+    local lib=$(libdir "$name")
+    if is_subunit "$name" && [ ! -e "$ROOT/library/vhdlFiles/lsq/$name.vhd" ]; then
+        if ! python3 "$ROOT/scripts/lsq_subunits.py" emit "$name" "$ROOT/library/vhdlFiles/lsq" >> "$logf" 2>&1; then
+            log "w$wid $pass $name FAILED writing its VHDL (see $logf)"; return 1
+        fi
+    fi
     if [ ! -e "$ROOT/library/vhdlSynthDCPs/$PART/${name}_synth.dcp" ] && [ ! -e "$ROOT/library/genericSynthDCPs/$PART/${name}_synth.dcp" ]; then
         java_run "$wdir" "$logf" GenerateSynthesis -m "$name" -vhdl
         if [ ! -e "$ROOT/library/vhdlSynthDCPs/$PART/${name}_synth.dcp" ]; then
@@ -89,14 +100,14 @@ build_component() { # <worker id> <pass> <name>
     [ "$pass" = pass1 ] && num_args=(-num "$PASS1_SHAPES")
     java_run "$wdir" "$logf" GeneratePblocks -m "$name" -r "${num_args[@]}"
 
-    local shapes=$(ls "$LIBDIR/$name"/*_placedRouted.dcp 2>/dev/null | wc -l)
+    local shapes=$(ls "$lib/$name"/*_placedRouted.dcp 2>/dev/null | wc -l)
     if [ "$shapes" -eq 0 ]; then
         cleanup_component "$name" "$wdir"
         log "w$wid $pass $name FAILED: no placed and routed shapes (see $logf)"; return 1
     fi
 
     java_run "$wdir" "$logf" GenerateDatabase -m "$name"
-    if ! grep -q "^Pblock Name" "$LIBDIR/$name.data" 2>/dev/null; then
+    if ! grep -q "^Pblock Name" "$lib/$name.data" 2>/dev/null; then
         cleanup_component "$name" "$wdir"
         log "w$wid $pass $name FAILED database (see $logf)"; return 1
     fi

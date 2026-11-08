@@ -25,7 +25,7 @@ public class DatabaseGenerator {
 
     public static ArrayList<String> getAllPblocks (String dcpName)
     {
-        File file = new File(LocationParser.getPlacedRoutedDCPsPath().resolve(dcpName) + File.separator);
+        File file = new File(LocationParser.libraryPath(dcpName) + File.separator);
         if(!file.exists())
         {
             System.out.println("ERROR: Could not find the component " + dcpName + ". Maybe pblocks have not been generated");
@@ -64,7 +64,7 @@ public class DatabaseGenerator {
             if(pblocks == null)
                 throw new Exception();
 
-            String databaseLoc = LocationParser.getPlacedRoutedDCPsPath().resolve(dcpName + ".data").toString();
+            String databaseLoc = LocationParser.libraryPath(dcpName + ".data").toString();
             FileWriter dataWriter = new FileWriter(new File(databaseLoc));
 
             dataWriter.write(checkStrings[0] + sep + ch.agsl.dynarapid.GenerateDesign.fpga_part + "\n");
@@ -94,8 +94,7 @@ public class DatabaseGenerator {
     public static boolean generateBinaryDatabase(Component component)
     {
         System.out.println("Generating binary database for the component: " + component.dcpName);
-        String binaryDatabaseLoc = LocationParser.getPlacedRoutedDCPsPath()
-                    .resolve(component.dcpName + ".bin.data").toString();
+        String binaryDatabaseLoc = LocationParser.libraryPath(component.dcpName + ".bin.data").toString();
 
         try 
         {

@@ -424,6 +424,11 @@ public class Input implements Serializable
     public void stitchToOutput()
     {
         System.out.println("Stitching the inputs of the node: " + node.name + " of index: " + index);
+        if(ch.agsl.dynarapid.lsq.LsqAssembler.readsLsq(this))
+        {
+            ch.agsl.dynarapid.lsq.LsqAssembler.stitchKernelInput(this);
+            return;
+        }
 
         ModuleInst inputModuleInst = node.moduleInst;
         ModuleInst outputModuleInst;

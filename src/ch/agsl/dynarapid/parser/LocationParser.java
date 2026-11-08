@@ -151,6 +151,48 @@ public class LocationParser {
         return sub;
     }
 
+    // Tests: everything a shape build reads as synthesized input comes from <synth>, everything it
+    // writes goes under <root>. The root must lie outside DynaRapid's tree and the input outside
+    // its library (a unit without .util/metadata is synthesized into that directory), so a test
+    // never writes into the library.
+    public static synchronized void redirectForTest(String root, String synth) {
+        String r = new File(root).getAbsolutePath() + File.separator;
+        String s = new File(synth).getAbsolutePath() + File.separator;
+        String dr = new File(DYNARAPID_ROOT).getAbsolutePath() + File.separator;
+        if (r.startsWith(dr))
+            throw new IllegalArgumentException("test root inside DynaRapid: " + r);
+        if (s.startsWith(dr + "library" + File.separator))
+            throw new IllegalArgumentException("test input inside the library: " + s);
+        vhdlSynthDCPs = s;
+        genericSynthDCPs = partSubDir(r + "genericSynthDCPs" + File.separator);
+        preExposedDCPs = partSubDir(r + "pre-exposedDCPs" + File.separator);
+        exposedDCPs = partSubDir(r + "exposedDCPs" + File.separator);
+        placedRoutedDCPs = r + "placedRoutedDCPs";
+        placedRoutedDCPsPath = null;
+        vivadoRun = r + "vivadoRun" + File.separator;
+        new File(vivadoRun).mkdirs();
+    }
+
+    // Sub-units (the pieces an LSQ is assembled from, warp docs/plans/lsq-subunits.md) live in a
+    // folder of their own, in the library and in vhdlFiles; every other unit sits at the top
+    public static final String SUBUNIT_FOLDER = "lsq";
+    private static final java.util.regex.Pattern SUBUNIT = java.util.regex.Pattern.compile("^lsq_(core|ptq|qtp|ga)_.*");
+
+    public static boolean isSubunit(String name) {
+        return SUBUNIT.matcher(name).matches();
+    }
+
+    // A unit's file or folder in the library: <name>, <name>.data, ...
+    public static Path libraryPath(String file) {
+        Path lib = getPlacedRoutedDCPsPath();
+        return isSubunit(file) ? lib.resolve(SUBUNIT_FOLDER).resolve(file) : lib.resolve(file);
+    }
+
+    // A unit's file in vhdlFiles: <name>.vhd, <name>.ip.tcl
+    public static String vhdlPath(String file) {
+        return vhdlFiles + (isSubunit(file) ? SUBUNIT_FOLDER + File.separator : "") + file;
+    }
+
     public static synchronized Path getPlacedRoutedDCPsPath() {
         if (placedRoutedDCPsPath == null) {
             String dirName = placedRoutedDCPs + File.separator + GenerateDesign.part + "-" + RELEASE_VERSION;

@@ -1,0 +1,1606 @@
+{
+ "tbl_lsorder_0_b0": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b1": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b2": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b3": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b4": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b5": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b6": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b7": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b8": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b9": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b10": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b11": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b12": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b13": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b14": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_0_b15": {
+  "table": "lsorder",
+  "row": 0,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b0": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b1": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b2": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b3": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b4": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b5": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b6": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b7": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b8": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b9": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b10": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b11": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b12": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b13": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b14": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_1_b15": {
+  "table": "lsorder",
+  "row": 1,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b0": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b1": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b2": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b3": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b4": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b5": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b6": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b7": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b8": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b9": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b10": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b11": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b12": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b13": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b14": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_2_b15": {
+  "table": "lsorder",
+  "row": 2,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b0": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b1": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b2": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b3": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b4": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b5": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b6": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b7": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b8": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b9": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b10": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b11": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b12": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b13": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b14": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_3_b15": {
+  "table": "lsorder",
+  "row": 3,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b0": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b1": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b2": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b3": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b4": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b5": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b6": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b7": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b8": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b9": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b10": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b11": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b12": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b13": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b14": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_4_b15": {
+  "table": "lsorder",
+  "row": 4,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b0": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b1": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b2": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b3": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b4": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b5": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b6": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b7": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b8": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b9": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b10": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b11": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b12": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b13": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b14": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_5_b15": {
+  "table": "lsorder",
+  "row": 5,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b0": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b1": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b2": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b3": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b4": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b5": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b6": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b7": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b8": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b9": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b10": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b11": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b12": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b13": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b14": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_6_b15": {
+  "table": "lsorder",
+  "row": 6,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b0": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b1": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b2": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b3": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b4": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b5": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b6": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b7": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b8": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b9": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b10": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b11": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b12": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b13": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b14": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_7_b15": {
+  "table": "lsorder",
+  "row": 7,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b0": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b1": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b2": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b3": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b4": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b5": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b6": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b7": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b8": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b9": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b10": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b11": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b12": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b13": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b14": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_8_b15": {
+  "table": "lsorder",
+  "row": 8,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b0": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b1": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b2": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b3": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b4": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b5": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b6": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b7": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b8": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b9": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b10": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b11": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b12": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b13": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b14": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_9_b15": {
+  "table": "lsorder",
+  "row": 9,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b0": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b1": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b2": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b3": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b4": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b5": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b6": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b7": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b8": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b9": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b10": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b11": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b12": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b13": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b14": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_10_b15": {
+  "table": "lsorder",
+  "row": 10,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b0": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b1": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b2": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b3": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b4": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b5": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b6": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b7": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b8": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b9": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b10": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b11": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b12": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b13": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b14": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_11_b15": {
+  "table": "lsorder",
+  "row": 11,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b0": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b1": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b2": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b3": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b4": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b5": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b6": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b7": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b8": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b9": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b10": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b11": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b12": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b13": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b14": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_12_b15": {
+  "table": "lsorder",
+  "row": 12,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b0": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b1": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b2": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b3": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b4": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b5": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b6": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b7": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b8": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b9": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b10": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b11": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b12": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b13": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b14": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_13_b15": {
+  "table": "lsorder",
+  "row": 13,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b0": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b1": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b2": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b3": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b4": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b5": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b6": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b7": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b8": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b9": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b10": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b11": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b12": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b13": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b14": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_14_b15": {
+  "table": "lsorder",
+  "row": 14,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b0": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b1": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b2": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b3": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b4": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 4,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b5": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 5,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b6": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 6,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b7": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 7,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b8": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 8,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b9": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 9,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b10": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 10,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b11": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 11,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b12": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 12,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b13": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 13,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b14": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 14,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_lsorder_15_b15": {
+  "table": "lsorder",
+  "row": 15,
+  "bit": 15,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_nld_0_b0": {
+  "table": "nld",
+  "row": 0,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_nld_0_b1": {
+  "table": "nld",
+  "row": 0,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_nld_0_b2": {
+  "table": "nld",
+  "row": 0,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_nld_0_b3": {
+  "table": "nld",
+  "row": 0,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_nst_0_b0": {
+  "table": "nst",
+  "row": 0,
+  "bit": 0,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_nst_0_b1": {
+  "table": "nst",
+  "row": 0,
+  "bit": 1,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_nst_0_b2": {
+  "table": "nst",
+  "row": 0,
+  "bit": 2,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "tbl_nst_0_b3": {
+  "table": "nst",
+  "row": 0,
+  "bit": 3,
+  "inputs": "I0-I4 group index, I5 any"
+ },
+ "thr_ld_0": {
+  "table": "nld_min",
+  "group": 0,
+  "inputs": "free load entries"
+ },
+ "thr_st_0": {
+  "table": "nst_min",
+  "group": 0,
+  "inputs": "free store entries"
+ },
+ "thr_ld_1": {
+  "table": "nld_min",
+  "group": 1,
+  "inputs": "free load entries"
+ },
+ "thr_st_1": {
+  "table": "nst_min",
+  "group": 1,
+  "inputs": "free store entries"
+ }
+}

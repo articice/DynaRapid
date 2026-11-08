@@ -19,7 +19,7 @@ import ch.agsl.dynarapid.parser.PblockUtilizationParser;
 public class PblockDensity {
     
     public static double density(String pblockName, String dcpName) {
-        String utilLoc = LocationParser.getPlacedRoutedDCPsPath().resolve(dcpName)
+        String utilLoc = LocationParser.libraryPath(dcpName)
                 .resolve(pblockName + ".util").toString();
         PblockUtilizationParser obj = new PblockUtilizationParser(utilLoc);
         if (!obj.status)

@@ -227,8 +227,8 @@ public class DatabaseParser {
     //Prioritizes binary databases over normal ones
     public Component parser(String dcpName, Device device)
     {
-        String databaseLoc = LocationParser.getPlacedRoutedDCPsPath().resolve(dcpName + ".data").toString();
-        String binaryDatabaseLoc = LocationParser.getPlacedRoutedDCPsPath().resolve(dcpName + ".bin.data").toString();
+        String databaseLoc = LocationParser.libraryPath(dcpName + ".data").toString();
+        String binaryDatabaseLoc = LocationParser.libraryPath(dcpName + ".bin.data").toString();
 
         // File file = new File(binaryDatabaseLoc);
         // Component component;
